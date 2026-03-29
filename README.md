@@ -176,6 +176,31 @@ RLSポリシーで SELECT/INSERT/UPDATE/DELETE を制御。
 
 ---
 
+## SEO / メタデータ
+
+| ファイル | 用途 | サイズ |
+|---------|------|--------|
+| `app/icon.tsx` | ブラウザタブ ファビコン | 32x32 |
+| `app/apple-icon.tsx` | iPhone / iPad ホーム画面 | 180x180 |
+| `app/icon-192.png/route.tsx` | Android PWA アイコン | 192x192 |
+| `app/icon-512.png/route.tsx` | Android スプラッシュ / PWA | 512x512 |
+| `app/manifest.ts` | Web App Manifest（Android「ホームに追加」） | - |
+| `app/opengraph-image.tsx` | OGP画像（Facebook / LINE等） | 1200x630 |
+| `app/twitter-image.tsx` | X(Twitter)カード画像 | 1200x600 |
+| `app/robots.ts` | クローラー制御 | - |
+| `app/sitemap.ts` | サイトマップ（静的 + 動的） | - |
+
+### 設計
+
+- **アイコンは全て SVG → PNG 動的生成**（`next/og` の `ImageResponse`）。画像ファイル不要でデプロイだけで反映
+- **デザイン統一**: 南高カラー（緑 `#1a5632`）背景 + 白い野球ボールに赤い縫い目
+- **manifest.ts**: `maskable` purpose 指定で Android のアダプティブアイコン（丸型/角丸型）に対応
+- **robots.ts**: `/admin/*`, `/edit/*`, `/api/*`, `/login` を `disallow`。公開ページのみインデックス
+- **sitemap.ts**: 静的10ページ（優先度・更新頻度を個別設定）+ `results/[id]` を Supabase から動的生成（`updated_at` で `lastModified` を設定）
+- **sitemap の DB アクセス**: `@supabase/supabase-js` 直接クライアント使用（`cookies()` 非依存でビルド時・クローラーアクセス時も安定）
+
+---
+
 ## 開発のポイント
 
 - **Tailwind CSS 4 の `@theme`**: CSS変数でライト/ダークモードの色を一元管理
