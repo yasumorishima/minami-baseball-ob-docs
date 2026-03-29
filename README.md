@@ -180,10 +180,10 @@ RLSポリシーで SELECT/INSERT/UPDATE/DELETE を制御。
 
 | ファイル | 用途 | サイズ |
 |---------|------|--------|
-| `app/icon.tsx` | ブラウザタブ ファビコン | 32x32 |
-| `app/apple-icon.tsx` | iPhone / iPad ホーム画面 | 180x180 |
-| `app/icon-192.png/route.tsx` | Android PWA アイコン | 192x192 |
-| `app/icon-512.png/route.tsx` | Android スプラッシュ / PWA | 512x512 |
+| `app/icon.png` | ブラウザタブ ファビコン（南高校章） | 32x32 |
+| `app/apple-icon.png` | iPhone / iPad ホーム画面 | 180x180 |
+| `public/icon-192.png` | Android PWA アイコン | 192x192 |
+| `public/icon-512.png` | Android スプラッシュ / PWA | 512x512 |
 | `app/manifest.ts` | Web App Manifest（Android「ホームに追加」） | - |
 | `app/opengraph-image.tsx` | OGP画像（Facebook / LINE等） | 1200x630 |
 | `app/twitter-image.tsx` | X(Twitter)カード画像 | 1200x600 |
@@ -192,8 +192,8 @@ RLSポリシーで SELECT/INSERT/UPDATE/DELETE を制御。
 
 ### 設計
 
-- **アイコンは全て SVG → PNG 動的生成**（`next/og` の `ImageResponse`）。画像ファイル不要でデプロイだけで反映
-- **デザイン統一**: 南高カラー（緑 `#1a5632`）背景 + 白い野球ボールに赤い縫い目
+- **ファビコン・アプリアイコンは南高校章**の静的PNG（sharpで元画像から各サイズ生成）
+- **OGP / Twitter画像は SVG → PNG 動的生成**（`next/og` の `ImageResponse`）
 - **manifest.ts**: `maskable` purpose 指定で Android のアダプティブアイコン（丸型/角丸型）に対応
 - **robots.ts**: `/admin/*`, `/edit/*`, `/api/*`, `/login` を `disallow`。公開ページのみインデックス
 - **sitemap.ts**: 静的10ページ（優先度・更新頻度を個別設定）+ `results/[id]` を Supabase から動的生成（`updated_at` で `lastModified` を設定）
