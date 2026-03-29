@@ -1,5 +1,7 @@
 # 横浜市立南高校 野球部OB会 公式サイト
 
+<img src="icon.png" alt="南高校章" width="64">
+
 マスターズ甲子園への挑戦、OB会の活動予定・試合結果、現役野球部の情報を掲載する公式サイトの技術解説です。
 
 > **本番サイト**: https://minami-baseball-ob.vercel.app/
