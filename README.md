@@ -50,7 +50,7 @@
 | Styling | **Tailwind CSS 4** (PostCSS-first, `@theme` CSS variables) |
 | Database | **Supabase** (PostgreSQL + RLS + DB Triggers) |
 | Auth | **Supabase Auth** (Google OAuth / SSR cookie pattern) |
-| Storage | **Supabase Storage** (photos + videos, client-side resize) |
+| Storage | **Supabase Storage** (photos + videos + member docs, client-side resize) |
 | Hosting | **Vercel** (git push auto-deploy) |
 | CI/CD | **GitHub Actions** (4 workflows) |
 | Analytics | **Google Analytics 4** (Cookie consent gate) |
@@ -85,18 +85,18 @@
                                                   |
                                          +--------v----------+
                                          |  Next.js 15 App   |
-                                         |  35 pages + 9 API |
+                                         |  36 pages + 9 API |
                                          |  30 components    |
                                          +--------+----------+
                                                   |
                                +------------------+------------------+
                                |                  |                  |
                       +--------v---+    +---------v----+   +---------v---+
-                      | Supabase   |    | Supabase     |   | Supabase    |
-                      | PostgreSQL |    | Auth (OAuth)  |   | Storage     |
-                      | 14 tables  |    | Google SSO   |   | photos/     |
-                      | RLS + Trig |    | 5-tier RBAC  |   | videos/     |
-                      +------------+    +--------------+   +-------------+
+                      | Supabase   |    | Supabase     |   | Supabase      |
+                      | PostgreSQL |    | Auth (OAuth)  |   | Storage       |
+                      | 15 tables  |    | Google SSO   |   | photos/       |
+                      | RLS + Trig |    | 5-tier RBAC  |   | members-docs/ |
+                      +------------+    +--------------+   +---------------+
 ```
 
 ---
@@ -107,11 +107,11 @@
 |--------|-------|
 | TypeScript/TSX files | 98 |
 | Lines of code | ~10,600 |
-| Page routes | 35 |
+| Page routes | 36 |
 | API routes | 9 |
 | Reusable components | 30 |
-| DB tables (+ history) | 14 + 4 |
-| DB migrations | 20+ |
+| DB tables (+ history) | 15 + 5 |
+| DB migrations | 25 |
 | GitHub Actions workflows | 4 |
 | Historical game records | 680 (1955-2026) |
 
@@ -127,8 +127,8 @@ Middleware + RLS の2層で認可を実施。全操作を権限に応じて制�
 |-------|------|--------|
 | 1 | Guest | Public pages |
 | 2 | `viewer` | Logged in, awaiting approval |
-| 3 | `member` | + Member-only pages (directory, dues) |
-| 4 | `editor` | + Content CRUD (8 edit pages) |
+| 3 | `member` | + Member-only pages (総会・支援・会計・役員資料) |
+| 4 | `editor` | + Content CRUD (9 edit pages) |
 | 5 | `admin` | + User management, audit logs, trash |
 
 - **Next.js Middleware**: Route-level access control, redirect unauthorized users
@@ -178,7 +178,7 @@ Google Form (category + description + images)
 
 外部CMSを使わず、**Supabase + Next.js で構築した独自CMS**。ソフトデリート、変更履歴、監査ログを標準装備。
 
-- **8 editor pages**: Results, Schedule, Announcements, Media, Masters, History, Dues, Current Team
+- **9 editor pages**: Results, Schedule, Announcements, Media, Masters, History, Dues, Current Team, Members Posts
 - **Inline editing**: Edit content directly on detail pages (no page transition)
 - **Inline photo upload**: Upload photos from any detail page
 - **Soft delete + 7-day trash**: Auto-purge via scheduled GitHub Actions
@@ -195,10 +195,20 @@ Google Form (category + description + images)
 - Storage usage visualization with progress bar (1GB quota)
 - FC2 archive photos migrated (2010-2012 event thumbnails)
 
+### Members-Only Content Management
+
+会員専用ページに4カテゴリの資料管理。PDF添付・年度別グルーピング・役員テーブル編集を統合。
+
+- **4 categories**: OB会総会 / 野球部支援 / 会計関係 / OB会役員
+- **File attachments**: Upload to private `members-docs` bucket, download via signed URLs
+- **Fiscal year grouping**: Auto-group by Japanese fiscal year (April start) with wareki labels
+- **Officer table**: OB会役員 category renders as editable role/name/class table
+- **Inline CRUD**: Editors can create/edit/delete posts directly on the members-only page
+
 ### Search & Discovery
 
 - **Global search**: Cross-table full-text search (results, schedule, announcements, history)
-- **Result filtering**: Masters Koshien / Practice / Other tab switching
+- **Result filtering**: Masters Koshien / Practice / Golf / Other tab switching
 - **Bookmarks**: Logged-in users can save articles (RLS: own data only)
 - **Gallery auto-scroll**: `?open=folder` query parameter for deep linking
 
@@ -206,24 +216,29 @@ Google Form (category + description + images)
 
 ## Database Design
 
-14 tables + 4 history tables + 4 views, all protected by Row-Level Security.
+15 tables + 5 history tables + 5 views, all protected by Row-Level Security.
 
 ```
 user_roles ----< results         (author)
     |      ----< schedule        (author)
     |      ----< announcements   (author)
     |      ----< current_team_posts (author)
+    |      ----< members_posts   (author, member+ read, editor+ write)
     |      ----< bookmarks       (owner, RLS: self-only)
     |      ----< dues_payments   (target member)
     |
     +-- audit_logs               (auto-recorded by DB triggers)
-    +-- *_history (x4)           (auto-saved on UPDATE/DELETE)
+    +-- *_history (x5)           (auto-saved on UPDATE/DELETE)
 
 photos ----< results | schedule | announcements | history
 videos ----< results | schedule | announcements
 
 schedule <---> results           (bidirectional via schedule_id)
 masters_documents                (tournament PDFs, stored in GitHub)
+
+Storage buckets:
+  photos/        (public, gallery + inline uploads)
+  members-docs/  (private, member+ read, signed URL download)
 ```
 
 ### Tables
@@ -235,6 +250,7 @@ masters_documents                (tournament PDFs, stored in GitHub)
 | `schedule` | Events (games, practice, social). Soft delete |
 | `announcements` | News posts. Soft delete |
 | `current_team_posts` | Current team news. Soft delete |
+| `members_posts` | Members-only posts (4 categories, file attachments via JSONB, fiscal year grouping). Soft delete |
 | `photos` | Photo metadata (Storage integration, FK linkage, soft delete, history linkage) |
 | `videos` | Videos (YouTube embed URL) |
 | `members` | Member info (admin-only read via RLS) |
@@ -242,7 +258,7 @@ masters_documents                (tournament PDFs, stored in GitHub)
 | `dues_payments` | Membership dues (per fiscal year, with/without account) |
 | `audit_logs` | Audit trail (privilege changes, soft deletes via DB trigger) |
 | `bookmarks` | User bookmarks (RLS: self-only) |
-| `*_history` (x4) | Change history (auto-saved on UPDATE/DELETE via DB trigger) |
+| `*_history` (x5) | Change history (auto-saved on UPDATE/DELETE via DB trigger) |
 
 ### DB Functions & Triggers
 
@@ -261,7 +277,7 @@ masters_documents                (tournament PDFs, stored in GitHub)
 - **Soft delete** on all content tables (`deleted_at` column) with 7-day auto-purge
 - **DB triggers** for `updated_at`, audit logging, and history snapshots
 - **Views** (`*_with_author`) join author display names with `deleted_at IS NULL` filter
-- **20+ versioned migrations** in `supabase/migrations/`
+- **25 versioned migrations** in `supabase/migrations/`
 
 ---
 
@@ -289,7 +305,7 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 
 | Measure | Implementation |
 |---------|---------------|
-| **Row-Level Security** | All tables. `members` table: admin-only read (anon/authenticated blocked) |
+| **Row-Level Security** | All tables. `members_posts`: member+ read. Private storage bucket with signed URLs |
 | **Server-only admin client** | `import "server-only"` prevents client-side import of service_role key |
 | **Auth callback validation** | Open redirect prevention in `/auth/callback` |
 | **Workflow permissions** | Every GitHub Actions workflow declares minimal permissions |
@@ -345,9 +361,9 @@ Auth (4 pages)
   /login                   Google OAuth login
   /account                 Profile, data export, cookie settings, account deletion
   /bookmarks               Saved articles
-  /members-only/*          Member directory, dues payment status
+  /members-only            Members-only content (4 categories, inline CRUD, file attachments)
 
-Editor (8 pages)
+Editor (9 pages)
   /edit/results            Game results CRUD
   /edit/schedule           Events CRUD
   /edit/announce           Announcements CRUD
@@ -356,6 +372,7 @@ Editor (8 pages)
   /edit/history            Historical game photo management
   /edit/dues               Membership dues tracking
   /edit/current-team       Current team posts CRUD
+  /edit/members-posts      Members-only posts CRUD
 
 Admin (4 pages)
   /admin                   Dashboard
@@ -389,4 +406,5 @@ Admin (4 pages)
 - **Data migrated**: 歴代戦績 680試合 (1955-2026) -> `data/senseki.json` (41% verified)
 - **Data migrated**: マスターズ甲子園過去戦績 20試合 (2011-2024) -> `results` table
 - **Photos migrated**: FC2 event thumbnails 15枚 (2010-2012) -> Supabase Storage
-- **Remaining**: 会長挨拶、役員一覧（個人情報要判断）
+- **Migrated to members-only**: 役員一覧 (12名) -> `members_posts` (OB会役員カテゴリ)
+- **Remaining**: 会長挨拶（個人情報要判断）
