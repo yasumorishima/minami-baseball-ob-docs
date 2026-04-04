@@ -5,7 +5,7 @@
 マスターズ甲子園への挑戦、OB会の活動予定・試合結果、現役野球部の情報を掲載する公式サイトの技術解説です。
 
 > **本番サイト**: https://minami-baseball-ob.vercel.app/
-> **ソースコード**: https://github.com/yasumorishima/minami-baseball-ob（private）
+> **ソースコード**: https://github.com/yasumorishima/minami-baseball-ob （private）
 
 ---
 
