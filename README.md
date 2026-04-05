@@ -50,7 +50,7 @@
 | Styling | **Tailwind CSS 4** (PostCSS-first, `@theme` CSS variables) |
 | Database | **Supabase** (PostgreSQL + RLS + DB Triggers) |
 | Auth | **Supabase Auth** (Google OAuth / SSR cookie pattern) |
-| Storage | **Supabase Storage** (photos + videos + member docs, client-side resize) |
+| Storage | **Supabase Storage** (photos + videos + member docs + golf score PDFs, client-side resize) |
 | Hosting | **Vercel** (git push auto-deploy) |
 | CI/CD | **GitHub Actions** (4 workflows) |
 | Analytics | **Google Analytics 4** (Cookie consent gate) |
@@ -85,7 +85,7 @@
                                                   |
                                          +--------v----------+
                                          |  Next.js 15 App   |
-                                         |  36 pages + 9 API |
+                                         |  38 pages + 9 API |
                                          |  30 components    |
                                          +--------+----------+
                                                   |
@@ -94,9 +94,10 @@
                       +--------v---+    +---------v----+   +---------v---+
                       | Supabase   |    | Supabase     |   | Supabase      |
                       | PostgreSQL |    | Auth (OAuth)  |   | Storage       |
-                      | 15 tables  |    | Google SSO   |   | photos/       |
+                      | 21 tables  |    | Google SSO   |   | photos/       |
                       | RLS + Trig |    | 5-tier RBAC  |   | members-docs/ |
-                      +------------+    +--------------+   +---------------+
+                      +------------+    +--------------+   | documents/    |
+                                                           +---------------+
 ```
 
 ---
@@ -107,11 +108,11 @@
 |--------|-------|
 | TypeScript/TSX files | 98 |
 | Lines of code | ~10,600 |
-| Page routes | 36 |
+| Page routes | 38 |
 | API routes | 9 |
 | Reusable components | 30 |
-| DB tables (+ history) | 15 + 5 |
-| DB migrations | 25 |
+| DB tables (+ history) | 21 + 6 |
+| DB migrations | 26 |
 | GitHub Actions workflows | 4 |
 | Historical game records | 680 (1955-2026) |
 
@@ -127,8 +128,8 @@ Middleware + RLS の2層で認可を実施。全操作を権限に応じて制�
 |-------|------|--------|
 | 1 | Guest | Public pages |
 | 2 | `viewer` | Logged in, awaiting approval |
-| 3 | `member` | + Member-only pages (総会・支援・会計・役員資料) |
-| 4 | `editor` | + Content CRUD (9 edit pages) |
+| 3 | `member` | + Member-only pages (総会・支援・会計・役員資料・ゴルフコンペ) |
+| 4 | `editor` | + Content CRUD (10 edit pages) |
 | 5 | `admin` | + User management, audit logs, trash |
 
 - **Next.js Middleware**: Route-level access control, redirect unauthorized users
@@ -178,7 +179,7 @@ Google Form (category + description + images)
 
 外部CMSを使わず、**Supabase + Next.js で構築した独自CMS**。ソフトデリート、変更履歴、監査ログを標準装備。
 
-- **9 editor pages**: Results, Schedule, Announcements, Media, Masters, History, Dues, Current Team, Members Posts
+- **10 editor pages**: Results, Schedule, Announcements, Media, Masters, History, Dues, Current Team, Members Posts, Golf
 - **Inline editing**: Edit content directly on detail pages (no page transition)
 - **Inline photo upload**: Upload photos from any detail page
 - **Soft delete + 7-day trash**: Auto-purge via scheduled GitHub Actions
@@ -197,9 +198,9 @@ Google Form (category + description + images)
 
 ### Members-Only Content Management
 
-会員専用ページに4カテゴリの資料管理。PDF添付・年度別グルーピング・役員テーブル編集を統合。
+会員専用ページに5カテゴリの資料管理。PDF添付・年度別グルーピング・役員テーブル編集・ゴルフコンペ歴代結果を統合。
 
-- **4 categories**: OB会総会 / 野球部支援 / 会計関係 / OB会役員
+- **5 categories**: OB会総会 / 野球部支援 / 会計関係 / OB会役員 / ゴルフコンペ
 - **File attachments**: Upload to private `members-docs` bucket, download via signed URLs
 - **Fiscal year grouping**: Auto-group by Japanese fiscal year (April start) with wareki labels
 - **Officer table**: OB会役員 category renders as editable role/name/class table
@@ -208,7 +209,7 @@ Google Form (category + description + images)
 ### Search & Discovery
 
 - **Global search**: Cross-table full-text search (results, schedule, announcements, history)
-- **Result filtering**: Masters Koshien / Practice / Golf / Other tab switching
+- **Result filtering**: Masters Koshien / Practice / Golf / Other tab switching (Golf tab links to members-only page)
 - **Bookmarks**: Logged-in users can save articles (RLS: own data only)
 - **Gallery auto-scroll**: `?open=folder` query parameter for deep linking
 
@@ -216,7 +217,7 @@ Google Form (category + description + images)
 
 ## Database Design
 
-15 tables + 5 history tables + 5 views, all protected by Row-Level Security.
+21 tables + 6 history tables + 5 views, all protected by Row-Level Security.
 
 ```
 user_roles ----< results         (author)
@@ -228,7 +229,8 @@ user_roles ----< results         (author)
     |      ----< dues_payments   (target member)
     |
     +-- audit_logs               (auto-recorded by DB triggers)
-    +-- *_history (x5)           (auto-saved on UPDATE/DELETE)
+    +-- golf_competitions        (golf competition results, 30 records)
+    +-- *_history (x6)           (auto-saved on UPDATE/DELETE, incl. golf_competitions_history)
 
 photos ----< results | schedule | announcements | history
 videos ----< results | schedule | announcements
@@ -239,6 +241,7 @@ masters_documents                (tournament PDFs, stored in GitHub)
 Storage buckets:
   photos/        (public, gallery + inline uploads)
   members-docs/  (private, member+ read, signed URL download)
+  documents/     (private, golf score PDFs, signed URL download)
 ```
 
 ### Tables
@@ -258,7 +261,8 @@ Storage buckets:
 | `dues_payments` | Membership dues (per fiscal year, with/without account) |
 | `audit_logs` | Audit trail (privilege changes, soft deletes via DB trigger) |
 | `bookmarks` | User bookmarks (RLS: self-only) |
-| `*_history` (x5) | Change history (auto-saved on UPDATE/DELETE via DB trigger) |
+| `golf_competitions` | Golf competition results (30 records, score PDFs via documents/ bucket). Soft delete |
+| `*_history` (x6) | Change history (auto-saved on UPDATE/DELETE via DB trigger, incl. golf_competitions_history) |
 
 ### DB Functions & Triggers
 
@@ -277,7 +281,7 @@ Storage buckets:
 - **Soft delete** on all content tables (`deleted_at` column) with 7-day auto-purge
 - **DB triggers** for `updated_at`, audit logging, and history snapshots
 - **Views** (`*_with_author`) join author display names with `deleted_at IS NULL` filter
-- **25 versioned migrations** in `supabase/migrations/`
+- **26 versioned migrations** in `supabase/migrations/`
 
 ---
 
@@ -357,13 +361,14 @@ Public (15 pages)
   /history/[id]            Historical game detail
   /search                  Cross-table full-text search
 
-Auth (4 pages)
+Auth (5 pages)
   /login                   Google OAuth login
   /account                 Profile, data export, cookie settings, account deletion
   /bookmarks               Saved articles
-  /members-only            Members-only content (4 categories, inline CRUD, file attachments)
+  /members-only            Members-only content (5 categories, inline CRUD, file attachments)
+  /members-only/golf       Golf competition history (30 results + score PDFs)
 
-Editor (9 pages)
+Editor (10 pages)
   /edit/results            Game results CRUD
   /edit/schedule           Events CRUD
   /edit/announce           Announcements CRUD
@@ -373,6 +378,7 @@ Editor (9 pages)
   /edit/dues               Membership dues tracking
   /edit/current-team       Current team posts CRUD
   /edit/members-posts      Members-only posts CRUD
+  /edit/golf               Golf competition results CRUD
 
 Admin (4 pages)
   /admin                   Dashboard
@@ -406,5 +412,7 @@ Admin (4 pages)
 - **Data migrated**: 歴代戦績 680試合 (1955-2026) -> `data/senseki.json` (41% verified)
 - **Data migrated**: マスターズ甲子園過去戦績 20試合 (2011-2024) -> `results` table
 - **Photos migrated**: FC2 event thumbnails 15枚 (2010-2012) -> Supabase Storage
+- **Data migrated**: ゴルフコンペ結果 31回分 (第1回〜第31回、第19回欠番で30件) -> `golf_competitions` table
+- **Files migrated**: スコア表PDF 25件 -> Supabase Storage (private `documents/` bucket)
 - **Migrated to members-only**: 役員一覧 (12名) -> `members_posts` (OB会役員カテゴリ)
 - **Remaining**: 会長挨拶（個人情報要判断）
