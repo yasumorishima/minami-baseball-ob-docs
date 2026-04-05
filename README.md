@@ -107,9 +107,9 @@
 <!-- stats-start (auto-updated by GitHub Actions) -->
 | Metric | Count |
 |--------|-------|
-| TypeScript/TSX files | <!--stat:ts_files-->111<!--/stat--> |
-| Lines of code | <!--stat:loc-->~12200<!--/stat--> |
-| Page routes | <!--stat:pages-->38<!--/stat--> |
+| TypeScript/TSX files | <!--stat:ts_files-->112<!--/stat--> |
+| Lines of code | <!--stat:loc-->~12300<!--/stat--> |
+| Page routes | <!--stat:pages-->39<!--/stat--> |
 | API routes | <!--stat:apis-->8<!--/stat--> |
 | Reusable components | <!--stat:components-->34<!--/stat--> |
 | DB tables (+ history) | <!--stat:tables_main-->15<!--/stat--> + <!--stat:tables_hist-->6<!--/stat--> |
