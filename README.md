@@ -2,7 +2,7 @@
 
 <img src="icon.png" alt="南高校章" width="64">
 
-マスターズ甲子園への挑戦を続ける横浜市立南高校 野球部OB会の公式Webアプリケーション。試合結果・予定管理、1955年からの歴代戦績680試合のデータベース、会員管理、写真ギャラリーなどを、5段階の権限制御のもとで運用しています。
+マスターズ甲子園への挑戦を続ける横浜市立南高校 野球部OB会の公式Webアプリケーション。試合結果・予定管理、1955年からの歴代戦績<!--stat:senseki-->680<!--/stat-->試合のデータベース、会員管理、写真ギャラリーなどを、5段階の権限制御のもとで運用しています。
 
 **https://minami-baseball-ob.vercel.app/** | ソースコード: private
 
@@ -170,11 +170,11 @@ Google Form (category + description + images)
 
 ### Historical Game Database (1955-2026)
 
-`data/senseki.json` に680試合分の戦績データを格納。FC2旧サイトからのパース、外部ソースとの突合検証を経て構築。
+`data/senseki.json` に<!--stat:senseki-->680<!--/stat-->試合分の戦績データを格納。FC2旧サイトからのパース、外部ソースとの突合検証を経て構築。
 
-- 680 games with stable IDs (validated by `scripts/validate-senseki-ids.js`)
+- <!--stat:senseki-->680<!--/stat--> games with stable IDs (validated by `scripts/validate-senseki-ids.js`)
 - Cross-referenced with multiple external sources
-- Dynamic sitemap generation for all 680 game detail pages
+- Dynamic sitemap generation for all <!--stat:senseki-->680<!--/stat--> game detail pages
 - Photo linkage per game (uploaded via admin UI)
 
 ### Content Management (Custom CMS)
@@ -220,7 +220,7 @@ Google Form (category + description + images)
 
 ## Database Design
 
-21 tables + 6 history tables + 5 views, all protected by Row-Level Security.
+<!--stat:tables_main-->15<!--/stat--> tables + <!--stat:tables_hist-->6<!--/stat--> history tables + 5 views, all protected by Row-Level Security.
 
 ```
 user_roles ----< results         (author)
@@ -362,7 +362,7 @@ Public (15 pages)
   /current-team            Current high school team
   /current-team/[id]       Team post detail
   /gallery                 Photo/video gallery (folder view)
-  /history                 Historical records 1955-2026 (680 games)
+  /history                 Historical records 1955-2026 (<!--stat:senseki-->680<!--/stat--> games)
   /history/[id]            Historical game detail
   /search                  Cross-table full-text search
 
@@ -414,7 +414,7 @@ Admin (4 pages)
 旧公式サイト（FC2）から段階的に情報を移管。
 
 - **Completed**: OB会概要・設立趣旨、活動内容、校歌・応援歌、関連リンク、OB会規約（全15条+付則）
-- **Data migrated**: 歴代戦績 680試合 (1955-2026) -> `data/senseki.json` (41% verified)
+- **Data migrated**: 歴代戦績 <!--stat:senseki-->680<!--/stat-->試合 (1955-2026) -> `data/senseki.json` (41% verified)
 - **Data migrated**: マスターズ甲子園過去戦績 20試合 (2011-2024) -> `results` table
 - **Photos migrated**: FC2 event thumbnails 15枚 (2010-2012) -> Supabase Storage
 - **Data migrated**: ゴルフコンペ結果 31回分 (第1回〜第31回、第19回欠番で30件) -> `golf_competitions` table
