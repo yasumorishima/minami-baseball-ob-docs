@@ -85,8 +85,8 @@
                                                   |
                                          +--------v----------+
                                          |  Next.js 15 App   |
-                                         |  38 pages + 8 API |
-                                         |  30 components    |
+                                         |  39 pages + 8 API |
+                                         |  35 components    |
                                          +--------+----------+
                                                   |
                                +------------------+------------------+
@@ -94,7 +94,7 @@
                       +--------v---+    +---------v----+   +---------v---+
                       | Supabase   |    | Supabase     |   | Supabase      |
                       | PostgreSQL |    | Auth (OAuth)  |   | Storage       |
-                      | 21 tables  |    | Google SSO   |   | photos/       |
+                      | 15 tables  |    | Google SSO   |   | photos/       |
                       | RLS + Trig |    | 5-tier RBAC  |   | members-docs/ |
                       +------------+    +--------------+   | documents/    |
                                                            +---------------+
@@ -107,7 +107,7 @@
 <!-- stats-start (auto-updated by GitHub Actions) -->
 | Metric | Count |
 |--------|-------|
-| TypeScript/TSX files | <!--stat:ts_files-->113<!--/stat--> |
+| TypeScript/TSX files | <!--stat:ts_files-->114<!--/stat--> |
 | Lines of code | <!--stat:loc-->~12800<!--/stat--> |
 | Page routes | <!--stat:pages-->39<!--/stat--> |
 | API routes | <!--stat:apis-->8<!--/stat--> |
