@@ -85,7 +85,7 @@
                                                   |
                                          +--------v----------+
                                          |  Next.js 15 App   |
-                                         |  38 pages + 9 API |
+                                         |  38 pages + 8 API |
                                          |  30 components    |
                                          +--------+----------+
                                                   |
@@ -104,17 +104,19 @@
 
 ## Project Scale
 
+<!-- stats-start (auto-updated by GitHub Actions) -->
 | Metric | Count |
 |--------|-------|
-| TypeScript/TSX files | 98 |
-| Lines of code | ~10,600 |
-| Page routes | 38 |
-| API routes | 9 |
-| Reusable components | 30 |
-| DB tables (+ history) | 21 + 6 |
-| DB migrations | 26 |
-| GitHub Actions workflows | 4 |
-| Historical game records | 680 (1955-2026) |
+| TypeScript/TSX files | <!--stat:ts_files-->107<!--/stat--> |
+| Lines of code | <!--stat:loc-->~11700<!--/stat--> |
+| Page routes | <!--stat:pages-->38<!--/stat--> |
+| API routes | <!--stat:apis-->8<!--/stat--> |
+| Reusable components | <!--stat:components-->30<!--/stat--> |
+| DB tables (+ history) | <!--stat:tables_main-->15<!--/stat--> + <!--stat:tables_hist-->6<!--/stat--> |
+| DB migrations | <!--stat:migrations-->26<!--/stat--> |
+| GitHub Actions workflows | <!--stat:workflows-->4<!--/stat--> |
+| Historical game records | <!--stat:senseki-->680<!--/stat--> (1955-2026) |
+<!-- stats-end -->
 
 ---
 
