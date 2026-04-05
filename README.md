@@ -107,14 +107,14 @@
 <!-- stats-start (auto-updated by GitHub Actions) -->
 | Metric | Count |
 |--------|-------|
-| TypeScript/TSX files | <!--stat:ts_files-->107<!--/stat--> |
-| Lines of code | <!--stat:loc-->~11700<!--/stat--> |
+| TypeScript/TSX files | <!--stat:ts_files-->110<!--/stat--> |
+| Lines of code | <!--stat:loc-->~12100<!--/stat--> |
 | Page routes | <!--stat:pages-->38<!--/stat--> |
 | API routes | <!--stat:apis-->8<!--/stat--> |
-| Reusable components | <!--stat:components-->30<!--/stat--> |
+| Reusable components | <!--stat:components-->33<!--/stat--> |
 | DB tables (+ history) | <!--stat:tables_main-->15<!--/stat--> + <!--stat:tables_hist-->6<!--/stat--> |
 | DB migrations | <!--stat:migrations-->26<!--/stat--> |
-| GitHub Actions workflows | <!--stat:workflows-->4<!--/stat--> |
+| GitHub Actions workflows | <!--stat:workflows-->5<!--/stat--> |
 | Historical game records | <!--stat:senseki-->680<!--/stat--> (1955-2026) |
 <!-- stats-end -->
 
