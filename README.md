@@ -52,7 +52,7 @@
 | Auth | **Supabase Auth** (Google OAuth / SSR cookie pattern) |
 | Storage | **Supabase Storage** (photos + videos + member docs + golf score PDFs, client-side resize) |
 | Hosting | **Vercel** (git push auto-deploy) |
-| CI/CD | **GitHub Actions** (4 workflows) |
+| CI/CD | **GitHub Actions** (5 workflows) |
 | Analytics | **Google Analytics 4** (Cookie consent gate) |
 | External | **Google Apps Script** (Form -> GitHub API bridge) |
 
@@ -72,7 +72,7 @@
                                   |
      +----------------------------v----------------------------+
      |                     GitHub Actions                      |
-     |  member-request.yml  sync-roles.yml  purge  keep-alive |
+     |  member-request  sync-roles  purge  keep-alive  stats  |
      +---+---------------------+-------------------------------+
          |                     |
          | PR auto-create      | Role sync
@@ -183,6 +183,7 @@ Google Form (category + description + images)
 
 - **10 editor pages**: Results, Schedule, Announcements, Media, Masters, History, Dues, Current Team, Members Posts, Golf
 - **Inline editing**: Edit content directly on detail pages (no page transition)
+- **Venue map preview**: Real-time Google Maps preview while typing venue search query (Maps Embed API, free)
 - **Inline photo upload**: Upload photos from any detail page
 - **Soft delete + 7-day trash**: Auto-purge via scheduled GitHub Actions
 - **Change history**: DB triggers auto-save previous versions on UPDATE/DELETE
@@ -295,6 +296,7 @@ Storage buckets:
 | **Sync Member Roles** | Push to `config/members.yml` | Parses YAML, updates Supabase `user_roles`, demotes unlisted users |
 | **Purge Deleted Records** | Daily (UTC 19:00) | Removes soft-deleted records + Storage objects older than 7 days |
 | **Keep Supabase Alive** | Weekly (Sunday UTC 0:00) | Pings Supabase REST API to prevent free-tier hibernation |
+| **Update README Stats** | Push to master / manual | Auto-update project stats + sync to docs repo |
 
 All workflows use **minimal `permissions`** (principle of least privilege).
 
@@ -335,6 +337,7 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 - All touch targets >= 44px
 - Dark mode with team color accent (maroon `#7b2234` / dark rose `#d08090`)
 - `aria-label` on result badges (Win/Loss/Draw)
+- Venue search with live map preview (confirm location before saving)
 - PWA install prompt (iOS Safari guide + Android native)
 - Page transition progress bar
 - Error boundaries with custom pixel art mascot
