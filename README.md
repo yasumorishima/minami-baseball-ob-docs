@@ -296,7 +296,17 @@ Storage buckets:
 | **Sync Member Roles** | Push to `config/members.yml` | Parses YAML, updates Supabase `user_roles`, demotes unlisted users |
 | **Purge Deleted Records** | Daily (UTC 19:00) | Removes soft-deleted records + Storage objects older than 7 days |
 | **Keep Supabase Alive** | Weekly (Sunday UTC 0:00) | Pings Supabase REST API to prevent free-tier hibernation |
-| **Update README Stats** | Push to master / manual | Auto-update project stats + sync to docs repo |
+| **Update README Stats** | Push to master / manual | Auto-update project stats + 3-repo sync (see below) |
+
+**3-Repo Auto Stats Sync**: `update-readme-stats.yml` がコード変更時にプロジェクト統計（ファイル数・LOC・ページ数・戦績数など10指標）を算出し、3つのリポジトリに自動反映する。
+
+```
+scripts/update-readme-stats.sh
+  → README.md の <!--stat:xxx--> マーカーを更新
+    → private repo (minami-baseball-ob): commit & push
+    → public docs repo (minami-baseball-ob-docs): GitHub API で <!--stat:xxx--> マーカー + アーキテクチャ図の数値を更新
+    → profile repo (yasumorishima): GitHub API で <!--ob:xxx--> マーカーを更新
+```
 
 All workflows use **minimal `permissions`** (principle of least privilege).
 
