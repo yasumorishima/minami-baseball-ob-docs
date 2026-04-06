@@ -52,7 +52,7 @@
 | Auth | **Supabase Auth** (Google OAuth / SSR cookie pattern) |
 | Storage | **Supabase Storage** (photos + videos + member docs + golf score PDFs, client-side resize) |
 | Hosting | **Vercel** (git push auto-deploy) |
-| CI/CD | **GitHub Actions** (5 workflows) |
+| CI/CD | **GitHub Actions** (6 workflows) |
 | Analytics | **Google Analytics 4** (Cookie consent gate) |
 | External | **Google Apps Script** (Form -> GitHub API bridge) |
 
@@ -72,7 +72,7 @@
                                   |
      +----------------------------v----------------------------+
      |                     GitHub Actions                      |
-     |  member-request  sync-roles  purge  keep-alive  stats  |
+     |  member-request  sync-roles  purge  check-team  stats  |
      +---+---------------------+-------------------------------+
          |                     |
          | PR auto-create      | Role sync
@@ -189,6 +189,7 @@ Google Form (category + description + images)
 - **Change history**: DB triggers auto-save previous versions on UPDATE/DELETE
 - **Audit logs**: All privilege changes and deletions are recorded
 - **Bidirectional linking**: Schedule <-> Results linked by `schedule_id`, photos shared across both
+- **Current team game detection**: Automated scraping from 2 sources (kyureki.com + hb-nippon.com) detects new games and creates GitHub Issues for human review before posting
 
 ### Photo & Media Management
 
@@ -296,6 +297,7 @@ Storage buckets:
 | **Sync Member Roles** | Push to `config/members.yml` | Parses YAML, updates Supabase `user_roles`, demotes unlisted users |
 | **Purge Deleted Records** | Daily (UTC 19:00) | Removes soft-deleted records + Storage objects older than 7 days |
 | **Keep Supabase Alive** | Weekly (Sunday UTC 0:00) | Pings Supabase REST API to prevent free-tier hibernation |
+| **Check Current Team** | Weekly (Monday JST 19:00) | Scrapes kyureki.com + hb-nippon.com for new games, auto-creates Issue for human review |
 | **Update README Stats** | Push to master / manual | Auto-update project stats + 3-repo sync (see below) |
 
 **3-Repo Auto Stats Sync**: `update-readme-stats.yml` がコード変更時にプロジェクト統計（ファイル数・LOC・ページ数・戦績数など10指標）を算出し、3つのリポジトリに自動反映する。
