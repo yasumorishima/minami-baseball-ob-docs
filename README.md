@@ -352,7 +352,7 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 - Page transition progress bar
 - Error boundaries with custom pixel art mascot
 - Breadcrumbs on all detail pages
-- Material Design-style ripple feedback on all interactive elements (shared `useRipple` hook)
+- Material Design-style ripple + press feedback on all interactive elements (`useRipple` hook, `TappableCard` for link cards with scale/translate animation)
 - Scroll-to-top floating button
 
 ---
