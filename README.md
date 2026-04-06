@@ -108,7 +108,7 @@
 | Metric | Count |
 |--------|-------|
 | TypeScript/TSX files | <!--stat:ts_files-->112<!--/stat--> |
-| Lines of code | <!--stat:loc-->~12200<!--/stat--> |
+| Lines of code | <!--stat:loc-->~12300<!--/stat--> |
 | Page routes | <!--stat:pages-->36<!--/stat--> |
 | API routes | <!--stat:apis-->8<!--/stat--> |
 | Reusable components | <!--stat:components-->36<!--/stat--> |
