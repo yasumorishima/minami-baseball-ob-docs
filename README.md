@@ -114,7 +114,7 @@
 | Reusable components | <!--stat:components-->36<!--/stat--> |
 | DB tables (+ history) | <!--stat:tables_main-->15<!--/stat--> + <!--stat:tables_hist-->6<!--/stat--> |
 | DB migrations | <!--stat:migrations-->29<!--/stat--> |
-| GitHub Actions workflows | <!--stat:workflows-->5<!--/stat--> |
+| GitHub Actions workflows | <!--stat:workflows-->6<!--/stat--> |
 | Historical game records | <!--stat:senseki-->680<!--/stat--> (1955-2026) |
 <!-- stats-end -->
 
