@@ -54,6 +54,8 @@
 | Hosting | **Vercel** (git push auto-deploy) |
 | CI/CD | **GitHub Actions** (6 workflows) |
 | Analytics | **Google Analytics 4** (Cookie consent gate) |
+| Maps | **Google Maps Embed API** (venue maps with navigation links) |
+| Testing | **Playwright** (e2e skeleton/navigation tests, screenshot verification) |
 | External | **Google Apps Script** (Form -> GitHub API bridge) |
 
 ---
@@ -176,12 +178,13 @@ Google Form (category + description + images)
 - Cross-referenced with multiple external sources
 - Dynamic sitemap generation for all <!--stat:senseki-->681<!--/stat--> game detail pages
 - Photo linkage per game (uploaded via admin UI)
+- **Nested collapsible UI**: Year → tournament type (春季/秋季/選手権/市長杯) grouping with win/loss stats per group
 
 ### Content Management (Custom CMS)
 
 外部CMSを使わず、**Supabase + Next.js で構築した独自CMS**。ソフトデリート、変更履歴、監査ログを標準装備。
 
-- **10 editor pages**: Results, Schedule, Announcements, Media, Masters, History, Dues, Current Team, Members Posts, Golf
+- **9 editor pages**: Results, Schedule, Announcements, Media, Masters, History, Dues, Members Posts, Golf
 - **Inline editing**: Edit content directly on detail pages (no page transition)
 - **Venue map preview**: Real-time Google Maps preview while typing venue search query (Maps Embed API, free)
 - **Inline photo upload**: Upload photos from any detail page
@@ -189,7 +192,7 @@ Google Form (category + description + images)
 - **Change history**: DB triggers auto-save previous versions on UPDATE/DELETE
 - **Audit logs**: All privilege changes and deletions are recorded
 - **Bidirectional linking**: Schedule <-> Results linked by `schedule_id`, photos shared across both
-- **Current team game detection**: Automated scraping from 2 sources (kyureki.com + hb-nippon.com) detects new games and creates GitHub Issues for human review before posting
+- **Current team game detection**: Automated scraping from 2 sources (kyureki.com + hb-nippon.com) detects new games, updates `senseki.json`, and auto-creates PR for human review
 
 ### Photo & Media Management
 
@@ -227,7 +230,6 @@ Google Form (category + description + images)
 user_roles ----< results         (author)
     |      ----< schedule        (author)
     |      ----< announcements   (author)
-    |      ----< current_team_posts (author)
     |      ----< members_posts   (author, member+ read, editor+ write)
     |      ----< bookmarks       (owner, RLS: self-only)
     |      ----< dues_payments   (target member)
@@ -256,7 +258,6 @@ Storage buckets:
 | `results` | Game results (Masters Koshien / practice / other). Soft delete |
 | `schedule` | Events (games, practice, social). Soft delete |
 | `announcements` | News posts. Soft delete |
-| `current_team_posts` | Current team news. Soft delete |
 | `members_posts` | Members-only posts (4 categories, file attachments via JSONB, fiscal year grouping). Soft delete |
 | `photos` | Photo metadata (Storage integration, FK linkage, soft delete, history linkage) |
 | `videos` | Videos (YouTube embed URL) |
@@ -355,6 +356,10 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 - Error boundaries with custom pixel art mascot
 - Breadcrumbs on all detail pages
 - Material Design-style ripple + press feedback on all interactive elements (`useRipple` hook, `TappableCard` for link cards with scale/translate animation)
+- **Skeleton loading**: Page-specific skeleton UI (`loading.tsx`) on all 10 main pages — layout matches actual page structure including `<details>` collapsible groups. Verified by Playwright e2e tests (30 pass)
+- **Unsaved warning**: Click capture (capture phase) intercepts Next.js Link navigation, popstate for browser back, beforeunload for reload/tab close. Applied to all 8 edit pages + 5 inline edit components
+- **Share button**: Web Share API (mobile native share sheet) with LINE fallback (desktop). On all 4 detail pages
+- **Google Calendar button**: One-tap calendar registration from schedule detail (URL scheme, no API key)
 - Scroll-to-top floating button
 
 ---
@@ -372,8 +377,6 @@ Public (15 pages)
   /schedule/[id]           Event detail
   /announcements           News
   /announcements/[id]      News detail
-  /current-team            Current high school team
-  /current-team/[id]       Team post detail
   /gallery                 Photo/video gallery (folder view)
   /history                 Historical records 1955-2026 (<!--stat:senseki-->681<!--/stat--> games)
   /history/[id]            Historical game detail
@@ -394,7 +397,6 @@ Editor (10 pages)
   /edit/masters            Tournament brackets + documents
   /edit/history            Historical game photo management
   /edit/dues               Membership dues tracking
-  /edit/current-team       Current team posts CRUD
   /edit/members-posts      Members-only posts CRUD
   /edit/golf               Golf competition results CRUD
 
