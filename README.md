@@ -109,7 +109,7 @@
 <!-- stats-start (auto-updated by GitHub Actions) -->
 | Metric | Count |
 |--------|-------|
-| TypeScript/TSX files | <!--stat:ts_files-->115<!--/stat--> |
+| TypeScript/TSX files | <!--stat:ts_files-->125<!--/stat--> |
 | Lines of code | <!--stat:loc-->~13100<!--/stat--> |
 | Page routes | <!--stat:pages-->36<!--/stat--> |
 | API routes | <!--stat:apis-->8<!--/stat--> |
@@ -356,7 +356,7 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 - Error boundaries with custom pixel art mascot
 - Breadcrumbs on all detail pages
 - Material Design-style ripple + press feedback on all interactive elements (`useRipple` hook, `TappableCard` for link cards with scale/translate animation)
-- **Skeleton loading**: Page-specific skeleton UI (`loading.tsx`) on all 10 main pages — layout matches actual page structure including `<details>` collapsible groups. Verified by Playwright e2e tests (30 pass)
+- **Skeleton loading**: Suspense-based skeleton UI on all 10 main pages — static UI (breadcrumbs, titles, filters) renders instantly, data sections show skeleton fallback. Page layout changes auto-propagate to loading state. Verified by Playwright e2e tests (30 pass)
 - **Unsaved warning**: Click capture (capture phase) intercepts Next.js Link navigation, popstate for browser back, beforeunload for reload/tab close. Applied to all 8 edit pages + 5 inline edit components
 - **Share button**: Web Share API (mobile native share sheet) with LINE fallback (desktop). On all 4 detail pages
 - **Google Calendar button**: One-tap calendar registration from schedule detail (URL scheme, no API key)
