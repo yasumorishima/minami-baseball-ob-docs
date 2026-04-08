@@ -87,8 +87,8 @@
                                                   |
                                          +--------v----------+
                                          |  Next.js 15 App   |
-                                         |  37 pages + 9 API |
-                                         |  38 components    |
+                                         |  38 pages + 9 API |
+                                         |  41 components    |
                                          +--------+----------+
                                                   |
                                +------------------+------------------+
@@ -109,11 +109,11 @@
 <!-- stats-start (auto-updated by GitHub Actions) -->
 | Metric | Count |
 |--------|-------|
-| TypeScript/TSX files | <!--stat:ts_files-->119<!--/stat--> |
-| Lines of code | <!--stat:loc-->~13700<!--/stat--> |
-| Page routes | <!--stat:pages-->37<!--/stat--> |
+| TypeScript/TSX files | <!--stat:ts_files-->126<!--/stat--> |
+| Lines of code | <!--stat:loc-->~14300<!--/stat--> |
+| Page routes | <!--stat:pages-->38<!--/stat--> |
 | API routes | <!--stat:apis-->9<!--/stat--> |
-| Reusable components | <!--stat:components-->38<!--/stat--> |
+| Reusable components | <!--stat:components-->41<!--/stat--> |
 | DB tables (+ history) | <!--stat:tables_main-->15<!--/stat--> + <!--stat:tables_hist-->6<!--/stat--> |
 | DB migrations | <!--stat:migrations-->31<!--/stat--> |
 | GitHub Actions workflows | <!--stat:workflows-->6<!--/stat--> |
