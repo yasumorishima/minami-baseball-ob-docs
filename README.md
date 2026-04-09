@@ -55,8 +55,9 @@
 | CI/CD | **GitHub Actions** (6 workflows) |
 | Analytics | **Google Analytics 4** (Cookie consent gate) |
 | Maps | **Google Maps Embed API** (venue maps with navigation links) |
-| Testing | **Playwright** (e2e skeleton/navigation tests, screenshot verification) |
-| External | **Google Apps Script** (Form -> GitHub API bridge) |
+| Weather | **Open-Meteo API** (free, no API key, 30-min ISR cache) |
+| Testing | **Playwright** (e2e: skeleton/navigation/weather/screenshot) |
+| External | **Google Apps Script** (Member form dispatch + feedback Gmail notification) |
 
 ---
 
@@ -96,7 +97,7 @@
                       +--------v---+    +---------v----+   +---------v---+
                       | Supabase   |    | Supabase     |   | Supabase      |
                       | PostgreSQL |    | Auth (OAuth)  |   | Storage       |
-                      | 15 tables  |    | Google SSO   |   | photos/       |
+                      | 19 tables  |    | Google SSO   |   | photos/       |
                       | RLS + Trig |    | 5-tier RBAC  |   | members-docs/ |
                       +------------+    +--------------+   | documents/    |
                                                            +---------------+
@@ -133,7 +134,7 @@ Middleware + RLS の2層で認可を実施。全操作を権限に応じて制�
 | 1 | Guest | Public pages |
 | 2 | `viewer` | Logged in, awaiting approval |
 | 3 | `member` | + Member-only pages (総会・支援・会計・役員資料・ゴルフコンペ) |
-| 4 | `editor` | + Content CRUD (10 edit pages) |
+| 4 | `editor` | + Content CRUD (9 edit pages + inline editing) |
 | 5 | `admin` | + User management, audit logs, trash |
 
 - **Next.js Middleware**: Route-level access control, redirect unauthorized users
@@ -158,19 +159,20 @@ Google Form submit
 - Admin privilege escalation is rejected at workflow level
 - Duplicate requests are auto-skipped
 
-### Automated Bug Report Pipeline
+### In-App Feedback Form
 
-OBメンバーがGitHub不要でフィードバックを送信できる仕組み。サイト内 `/feedback` ページから送信。
+OBメンバーがGitHub不要でフィードバックを送信できる仕組み。サイト内 `/feedback` ページで完結。
 
 ```
-/feedback page (Googleログイン必須)
-  -> API route: validate + rate limit (5/hour per IP) + honeypot check
-    -> GitHub Issue auto-create (labels + Markdown image embeds)
+/feedback page (category + description + image upload)
+  -> Next.js API route
+    -> Create GitHub Issue with labels + image attachments
     -> GAS Web App -> Gmail notification to admin
 ```
 
-- Client-side image compression (max 3 images)
-- Camera capture / gallery selection with preview
+- Google login required (Supabase Auth)
+- Camera/gallery image upload with client-side compression (up to 3 images)
+- Honeypot + IP rate limiting (5 requests/hour) for spam protection
 
 ### Weather Forecast Integration
 
@@ -199,20 +201,22 @@ Open-Meteo API（無料）を使った球場別天気予報。予定との連動
 
 - **9 editor pages**: Results, Schedule, Announcements, Media, Masters, History, Dues, Members Posts, Golf
 - **Inline editing**: Edit content directly on detail pages (no page transition)
-- **Venue map preview**: Real-time Google Maps preview while typing venue search query (Maps Embed API, free)
+- **Venue maps**: Google Maps Embed API (place mode) on schedule/results detail pages, with navigation buttons. Editors can override map search query via `venue_map_query` field
 - **Inline photo upload**: Upload photos from any detail page
-- **Soft delete + 7-day trash**: Auto-purge via scheduled GitHub Actions
+- **Soft delete + 7-day trash**: All content tables including `dues_payments` support soft delete, auto-purge via scheduled GitHub Actions
 - **Change history**: DB triggers auto-save previous versions on UPDATE/DELETE
 - **Audit logs**: All privilege changes and deletions are recorded
 - **Bidirectional linking**: Schedule <-> Results linked by `schedule_id`, photos shared across both
 - **Current team game detection**: Automated scraping from 2 sources (kyureki.com + hb-nippon.com) detects new games, updates `senseki.json`, and auto-creates PR for human review
+- **Tournament photos**: Per-tournament photo section with `tournament_year` + `tournament_type` composite key
+- **Safe delete UX**: Delete buttons placed inside edit forms (not on list cards) to prevent accidental taps, with confirmation modal
 
 ### Photo & Media Management
 
 - Client-side resize (max 1200px, JPEG 85%) before upload to Supabase Storage
 - Multi-select batch delete
-- Lightbox viewer with keyboard navigation
-- Folder view grouped by linked content (results/schedule/history/announcements)
+- Lightbox viewer with keyboard navigation + touch swipe (createPortal for reliable fixed positioning)
+- Folder view grouped by linked content (results/schedule/history/announcements/tournament photos)
 - Storage usage visualization with progress bar (1GB quota)
 - FC2 archive photos migrated (2010-2012 event thumbnails)
 
@@ -220,11 +224,12 @@ Open-Meteo API（無料）を使った球場別天気予報。予定との連動
 
 会員専用ページに5カテゴリの資料管理。PDF添付・年度別グルーピング・役員テーブル編集・ゴルフコンペ歴代結果を統合。
 
-- **5 categories**: OB会総会 / 野球部支援 / 会計関係 / OB会役員 / ゴルフコンペ
-- **File attachments**: Upload to private `members-docs` bucket, download via signed URLs
-- **Fiscal year grouping**: Auto-group by Japanese fiscal year (April start) with wareki labels
+- **4 categories**: OB会総会 / 野球部支援 / 会計関係 / OB会役員
+- **File attachments**: Upload to private `members-docs` bucket, download via signed URLs (5-min expiry)
+- **Fiscal year grouping**: OB会総会 and 会計関係 auto-group by Japanese fiscal year (April start) with wareki labels
 - **Officer table**: OB会役員 category renders as editable role/name/class table
 - **Inline CRUD**: Editors can create/edit/delete posts directly on the members-only page
+- **Golf competitions**: Dedicated page with 30 historical results, 25 score PDFs, inline editing per round, linked to schedule entries
 
 ### Search & Discovery
 
@@ -237,7 +242,7 @@ Open-Meteo API（無料）を使った球場別天気予報。予定との連動
 
 ## Database Design
 
-<!--stat:tables_main-->15<!--/stat--> tables + <!--stat:tables_hist-->6<!--/stat--> history tables + 5 views, all protected by Row-Level Security.
+<!--stat:tables_main-->14<!--/stat--> tables + <!--stat:tables_hist-->5<!--/stat--> history tables + 4 views, all protected by Row-Level Security.
 
 ```
 user_roles ----< results         (author)
@@ -245,22 +250,24 @@ user_roles ----< results         (author)
     |      ----< announcements   (author)
     |      ----< members_posts   (author, member+ read, editor+ write)
     |      ----< bookmarks       (owner, RLS: self-only)
-    |      ----< dues_payments   (target member)
+    |      ----< dues_payments   (target member, soft delete)
     |
     +-- audit_logs               (auto-recorded by DB triggers)
     +-- golf_competitions        (golf competition results, 30 records)
-    +-- *_history (x6)           (auto-saved on UPDATE/DELETE, incl. golf_competitions_history)
+    +-- *_history (x5)           (auto-saved on UPDATE/DELETE)
 
-photos ----< results | schedule | announcements | history
+photos ----< results | schedule | announcements | history | tournament(year+type)
 videos ----< results | schedule | announcements
 
 schedule <---> results           (bidirectional via schedule_id)
+golf_competitions ---> schedule   (linked via schedule_id for venue/photos)
 masters_documents                (tournament PDFs, stored in GitHub)
 
 Storage buckets:
   photos/        (public, gallery + inline uploads)
+  videos/        (public)
   members-docs/  (private, member+ read, signed URL download)
-  documents/     (private, golf score PDFs, signed URL download)
+  documents/     (private, golf score PDFs, authenticated read)
 ```
 
 ### Tables
@@ -276,11 +283,11 @@ Storage buckets:
 | `videos` | Videos (YouTube embed URL) |
 | `members` | Member info (admin-only read via RLS) |
 | `masters_documents` | Tournament document metadata |
-| `dues_payments` | Membership dues (per fiscal year, with/without account) |
+| `dues_payments` | Membership dues (per fiscal year, with/without account). Soft delete |
 | `audit_logs` | Audit trail (privilege changes, soft deletes via DB trigger) |
 | `bookmarks` | User bookmarks (RLS: self-only) |
 | `golf_competitions` | Golf competition results (30 records, score PDFs via documents/ bucket). Soft delete |
-| `*_history` (x6) | Change history (auto-saved on UPDATE/DELETE via DB trigger, incl. golf_competitions_history) |
+| `*_history` (x5) | Change history (auto-saved on UPDATE/DELETE via DB trigger) |
 
 ### DB Functions & Triggers
 
@@ -296,10 +303,12 @@ Storage buckets:
 
 ### Key Design Decisions
 
-- **Soft delete** on all content tables (`deleted_at` column) with 7-day auto-purge
+- **Soft delete** on all content tables including `dues_payments` (`deleted_at` column) with 7-day auto-purge
 - **DB triggers** for `updated_at`, audit logging, and history snapshots
 - **Views** (`*_with_author`) join author display names with `deleted_at IS NULL` filter
-- **26 versioned migrations** in `supabase/migrations/`
+- **DB functions** for RLS: `get_user_role()`, `is_admin()`, `is_editor_or_above()`, `is_member_or_above()`
+- **`venue_map_query`** on schedule/results: editors can override Google Maps search query when venue name is ambiguous
+- **32 versioned migrations** in `supabase/migrations/`
 
 ---
 
@@ -311,7 +320,7 @@ Storage buckets:
 | **Sync Member Roles** | Push to `config/members.yml` | Parses YAML, updates Supabase `user_roles`, demotes unlisted users |
 | **Purge Deleted Records** | Daily (UTC 19:00) | Removes soft-deleted records + Storage objects older than 7 days |
 | **Keep Supabase Alive** | Weekly (Sunday UTC 0:00) | Pings Supabase REST API to prevent free-tier hibernation |
-| **Check Current Team** | Weekly (Monday JST 19:00) | Scrapes kyureki.com + hb-nippon.com for new games, auto-creates Issue for human review |
+| **Check Current Team** | Weekly (Monday JST 19:00) | Scrapes kyureki.com + hb-nippon.com for new games, updates senseki.json, auto-creates PR |
 | **Update README Stats** | Push to master / manual | Auto-update project stats + 3-repo sync (see below) |
 
 **3-Repo Auto Stats Sync**: `update-readme-stats.yml` がコード変更時にプロジェクト統計（ファイル数・LOC・ページ数・戦績数など10指標）を算出し、3つのリポジトリに自動反映する。
@@ -374,7 +383,10 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 - **Share button**: Web Share API (mobile native share sheet) with LINE fallback (desktop). On all 4 detail pages
 - **Google Calendar button**: One-tap calendar registration from schedule detail (URL scheme, no API key)
 - **Weather forecast**: Color-coded weather icons per weather group (sun=amber, cloud=gray, rain=blue, snow=sky, thunder=yellow), automatic light/dark mode via CSS variables
+- **LINE browser support**: Auto-detect LINE in-app browser on login — redirects to external browser for Google OAuth compatibility
+- **Safe delete UX**: Delete buttons inside edit forms only (not on list cards), with confirmation modal
 - Scroll-to-top floating button
+- Cookie consent banner (GA4 loads only after consent)
 
 ---
 
@@ -405,7 +417,7 @@ Auth (5 pages)
   /members-only            Members-only content (5 categories, inline CRUD, file attachments)
   /members-only/golf       Golf competition history (30 results + score PDFs)
 
-Editor (10 pages)
+Editor (9 pages)
   /edit/results            Game results CRUD
   /edit/schedule           Events CRUD
   /edit/announce           Announcements CRUD
