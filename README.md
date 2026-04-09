@@ -109,8 +109,8 @@
 <!-- stats-start (auto-updated by GitHub Actions) -->
 | Metric | Count |
 |--------|-------|
-| TypeScript/TSX files | <!--stat:ts_files-->126<!--/stat--> |
-| Lines of code | <!--stat:loc-->~14500<!--/stat--> |
+| TypeScript/TSX files | <!--stat:ts_files-->131<!--/stat--> |
+| Lines of code | <!--stat:loc-->~14700<!--/stat--> |
 | Page routes | <!--stat:pages-->38<!--/stat--> |
 | API routes | <!--stat:apis-->9<!--/stat--> |
 | Reusable components | <!--stat:components-->41<!--/stat--> |
