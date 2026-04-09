@@ -160,15 +160,28 @@ Google Form submit
 
 ### Automated Bug Report Pipeline
 
-OBメンバーがGitHub不要でフィードバックを送信できる仕組み。
+OBメンバーがGitHub不要でフィードバックを送信できる仕組み。サイト内 `/feedback` ページから送信。
 
 ```
-Google Form (category + description + images)
-  -> Google Apps Script
-    -> Upload images to issue-images repo (Contents API)
-    -> Create GitHub Issue with labels + Markdown image embeds
-      -> Gmail notification to admin
+/feedback page (Googleログイン必須)
+  -> API route: validate + rate limit (5/hour per IP) + honeypot check
+    -> GitHub Issue auto-create (labels + Markdown image embeds)
+    -> GAS Web App -> Gmail notification to admin
 ```
+
+- Client-side image compression (max 3 images)
+- Camera capture / gallery selection with preview
+
+### Weather Forecast Integration
+
+Open-Meteo API（無料）を使った球場別天気予報。予定との連動で試合当日の天気をすぐ確認できる。
+
+- **10 venues** with lat/lon coordinates (`lib/venues.ts`)
+- **Schedule integration**: Weather badge on schedule list, full weather section on schedule detail
+- **`/weather` page**: All venues at a glance, expandable cards with 3-day forecast + hourly breakdown
+- **Color-coded icons**: Weather group-specific colors (sun=amber, cloud=gray, rain=blue, snow=sky, thunder=yellow) with CSS variables for automatic light/dark mode switching
+- **30-min ISR cache** via `next.revalidate` to avoid excessive API calls
+- Smooth card expand/collapse animation with scroll position correction
 
 ### Historical Game Database (1955-2026)
 
@@ -360,6 +373,7 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 - **Unsaved warning**: Click capture (capture phase) intercepts Next.js Link navigation, popstate for browser back, beforeunload for reload/tab close. Applied to all 8 edit pages + 5 inline edit components
 - **Share button**: Web Share API (mobile native share sheet) with LINE fallback (desktop). On all 4 detail pages
 - **Google Calendar button**: One-tap calendar registration from schedule detail (URL scheme, no API key)
+- **Weather forecast**: Color-coded weather icons per weather group (sun=amber, cloud=gray, rain=blue, snow=sky, thunder=yellow), automatic light/dark mode via CSS variables
 - Scroll-to-top floating button
 
 ---
@@ -367,20 +381,22 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 ## Page Structure
 
 ```
-Public (15 pages)
+Public (17 pages)
   /                        Top page (hero + photo grid + news + schedule + results)
   /about                   About the OB association
   /masters                 Masters Koshien info hub
   /results                 Game results (filter: masters/practice/other)
   /results/[id]            Game detail (photos, videos, inline edit)
   /schedule                Upcoming events
-  /schedule/[id]           Event detail
+  /schedule/[id]           Event detail (weather forecast + calendar registration)
   /announcements           News
   /announcements/[id]      News detail
   /gallery                 Photo/video gallery (folder view)
   /history                 Historical records 1955-2026 (<!--stat:senseki-->681<!--/stat--> games)
   /history/[id]            Historical game detail
   /search                  Cross-table full-text search
+  /weather                 Venue weather forecast (10 venues, 3-day + hourly)
+  /feedback                Bug report / feedback form (Google login required)
 
 Auth (5 pages)
   /login                   Google OAuth login
