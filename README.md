@@ -209,12 +209,12 @@ Open-Meteo API（無料）を使った球場別天気予報。予定との連動
 - **Bidirectional linking**: Schedule <-> Results linked by `schedule_id`, photos shared across both
 - **Current team game detection**: Automated scraping from 2 sources (kyureki.com + hb-nippon.com) detects new games, updates `senseki.json`, and auto-creates PR for human review
 - **Tournament photos**: Per-tournament photo section with `tournament_year` + `tournament_type` composite key
-- **Safe delete UX**: Delete buttons placed inside edit forms (not on list cards) to prevent accidental taps, with confirmation modal
+- **Safe delete UX (site-wide)**: Delete buttons are never shown on list cards or photo thumbnails. They live inside edit forms (edit pages + inline edit on detail pages + members-only inline edit) or behind a select mode (photos), always followed by a confirmation modal. Eliminates accidental taps across the entire admin surface
 
 ### Photo & Media Management
 
 - Client-side resize (max 1200px, JPEG 85%) before upload to Supabase Storage
-- Multi-select batch delete
+- Select-mode batch delete (tap "削除する写真を選ぶ" → select → confirm)
 - Lightbox viewer with keyboard navigation + touch swipe (createPortal for reliable fixed positioning)
 - Folder view grouped by linked content (results/schedule/history/announcements/tournament photos)
 - Storage usage visualization with progress bar (1GB quota)
@@ -384,7 +384,7 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 - **Google Calendar button**: One-tap calendar registration from schedule detail (URL scheme, no API key)
 - **Weather forecast**: Color-coded weather icons per weather group (sun=amber, cloud=gray, rain=blue, snow=sky, thunder=yellow), automatic light/dark mode via CSS variables
 - **LINE browser support**: Auto-detect LINE in-app browser on login — redirects to external browser for Google OAuth compatibility
-- **Safe delete UX**: Delete buttons inside edit forms only (not on list cards), with confirmation modal
+- **Safe delete UX**: Delete buttons are hidden from list views entirely — only accessible after entering edit mode or a dedicated select mode, always followed by a confirmation modal
 - Scroll-to-top floating button
 - Cookie consent banner (GA4 loads only after consent)
 
