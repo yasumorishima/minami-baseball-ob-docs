@@ -182,6 +182,7 @@ Open-Meteo API（無料）を使った球場別天気予報。予定との連動
 - **Schedule integration**: Weather badge on schedule list, full weather section on schedule detail
 - **`/weather` page**: All venues at a glance, expandable cards with 3-day forecast + hourly breakdown
 - **Color-coded icons**: Weather group-specific colors (sun=amber, cloud=gray, rain=blue, snow=sky, thunder=yellow) with CSS variables for automatic light/dark mode switching
+- **Context-aware precipitation icons**: 🌂 for 0%, ❄️ for snow (WMO codes 71-77, 85-86), ☔ otherwise
 - **30-min ISR cache** via `next.revalidate` to avoid excessive API calls
 - Smooth card expand/collapse animation with scroll position correction
 
