@@ -183,6 +183,9 @@ Open-Meteo API（無料）を使った球場別天気予報。予定との連動
 - **`/weather` page**: All venues at a glance, expandable cards with 3-day forecast + hourly breakdown
 - **Color-coded icons**: Weather group-specific colors (sun=amber, cloud=gray, rain=blue, snow=sky, thunder=yellow) with CSS variables for automatic light/dark mode switching
 - **Precipitation icons follow mainstream weather app conventions**: hidden when probability < 20% (matches NHK / tenki.jp / iPhone Weather), ☔ at 20% and above, ❄️ for snow (WMO codes 71-77, 85-86)
+- **Wind speed display** (m/s) on both daily and hourly views, color-coded by strength for baseball relevance: 穏やか (<5 m/s, subdued) / やや強 (5-9 m/s, normal) / 強風 (10+ m/s, red). Uses `wind_speed_unit=ms` on the Open-Meteo API (earlier code displayed km/h values labeled as m/s — fixed)
+- **Accurate Japanese WMO labels**: code 2 = 晴れ時々くもり (previously inverted as くもり時々晴れ), code 53 = 霧雨 (previously collided with code 63 rain), code 48 = 凍る霧 (previously mislabeled as 霧氷 which means rime ice on objects)
+- **Enlarged mobile hourly icons** (16 → 40 px) so composite icons like 晴れ時々くもり are actually distinguishable
 - **30-min ISR cache** via `next.revalidate` to avoid excessive API calls
 - Smooth card expand/collapse animation with scroll position correction
 
