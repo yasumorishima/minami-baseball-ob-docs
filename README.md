@@ -200,7 +200,8 @@ Open-Meteo API（無料）を使った球場別天気予報。予定との連動
 - Cross-referenced with multiple external sources
 - Dynamic sitemap generation for all <!--stat:senseki-->681<!--/stat--> game detail pages
 - Photo linkage per game (uploaded via admin UI)
-- **Nested collapsible UI**: Year → tournament type (春季/秋季/選手権/市長杯) grouping with win/loss stats per group
+- **Generation-based grouping (期)**: Records grouped by graduating class (e.g., 47期 = 2001 autumn → 2002 summer), newest-first within each tournament, rematches labeled with original round name
+- **Nested collapsible UI**: Generation → tournament type (選手権/市長杯/春季/秋季, newest first) with win/loss stats per group
 
 ### Content Management (Custom CMS)
 
@@ -385,7 +386,7 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 - Error boundaries with custom pixel art mascot
 - Breadcrumbs on all detail pages
 - Material Design-style ripple + press feedback on all interactive elements (`useRipple` hook, `TappableCard` for link cards with scale/translate animation)
-- **Skeleton loading**: Suspense-based skeleton UI on all 10 main pages — static UI (breadcrumbs, titles, filters) renders instantly, data sections show skeleton fallback. Page layout changes auto-propagate to loading state. Verified by Playwright e2e tests (30 pass)
+- **Skeleton loading**: Suspense-based skeleton UI on all 10 main pages — shared header components eliminate text duplication between skeleton and content, so layout changes auto-propagate to loading state. Verified by Playwright e2e tests (30 pass)
 - **Unsaved warning**: Click capture (capture phase) intercepts Next.js Link navigation, popstate for browser back, beforeunload for reload/tab close. Applied to all 8 edit pages + 5 inline edit components
 - **Share button**: Web Share API (mobile native share sheet) with LINE fallback (desktop). On all 4 detail pages
 - **Google Calendar button**: One-tap calendar registration from schedule detail (URL scheme, no API key)
