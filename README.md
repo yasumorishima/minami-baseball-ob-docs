@@ -83,7 +83,7 @@
      +---v---------------------v---+     +-------------------+
      |         GitHub Repo         |     |   Vercel (CDN)    |
      |  config/members.yml (RBAC)  +---->+   Auto Deploy     |
-     |  data/senseki.json (681g)   |push |   Fluid Compute   |
+     |                             |push |   Fluid Compute   |
      +-----------------------------+     +--------+----------+
                                                   |
                                          +--------v----------+
@@ -97,7 +97,7 @@
                       +--------v---+    +---------v----+   +---------v---+
                       | Supabase   |    | Supabase     |   | Supabase      |
                       | PostgreSQL |    | Auth (OAuth)  |   | Storage       |
-                      | 19 tables  |    | Google SSO   |   | photos/       |
+                      | 22 tables  |    | Google SSO   |   | photos/       |
                       | RLS + Trig |    | 5-tier RBAC  |   | members-docs/ |
                       +------------+    +--------------+   | documents/    |
                                                            +---------------+
@@ -194,9 +194,11 @@ Open-Meteo API（無料）を使った球場別天気予報。予定との連動
 
 ### Historical Game Database (1955-2026)
 
-`data/senseki.json` に<!--stat:senseki-->681<!--/stat-->試合分の戦績データを格納。FC2旧サイトからのパース、外部ソースとの突合検証を経て構築。
+Supabase `history_matches` テーブルに<!--stat:senseki-->681<!--/stat-->試合分の戦績データを格納。FC2旧サイトからのパース、外部ソースとの突合検証を経て構築。サイト上からeditor以上が直接編集可能。
 
-- <!--stat:senseki-->681<!--/stat--> games with stable IDs (validated by `scripts/validate-senseki-ids.js`)
+- <!--stat:senseki-->681<!--/stat--> games in `history_matches` table with DB sequence for auto-ID
+- **Inline editing on detail page**: Editors can fix scores, venues, opponents directly
+- **Update tracking**: `updated_by` / `updated_at` recorded by DB trigger, displayed on cards and detail pages
 - Cross-referenced with multiple external sources
 - Dynamic sitemap generation for all <!--stat:senseki-->681<!--/stat--> game detail pages
 - Photo linkage per game (uploaded via admin UI)
@@ -215,7 +217,7 @@ Open-Meteo API（無料）を使った球場別天気予報。予定との連動
 - **Change history**: DB triggers auto-save previous versions on UPDATE/DELETE
 - **Audit logs**: All privilege changes and deletions are recorded
 - **Bidirectional linking**: Schedule <-> Results linked by `schedule_id`, photos shared across both
-- **Current team game detection**: Automated scraping from 2 sources (kyureki.com + hb-nippon.com) detects new games, updates `senseki.json`, and auto-creates PR for human review
+- **Current team game detection**: Automated scraping from 2 sources (kyureki.com + hb-nippon.com) detects new games, inserts directly into Supabase `history_matches`, and creates GitHub Issue for review
 - **Tournament photos**: Per-tournament photo section with `tournament_year` + `tournament_type` composite key
 - **Safe delete UX (site-wide)**: Delete buttons are never shown on list cards or photo thumbnails. They live inside edit forms at the header (high-visibility red button with 🗑 icon, works in both light and dark mode) or behind a select mode (photos), always followed by a confirmation modal. Covers edit pages, inline edit on detail pages, members-only inline edit, edit/dues, edit/masters documents, and PDF unlink actions — every destructive action has a confirmation step
 
@@ -328,7 +330,7 @@ Storage buckets:
 | **Sync Member Roles** | Push to `config/members.yml` | Parses YAML, updates Supabase `user_roles`, demotes unlisted users |
 | **Purge Deleted Records** | Daily (UTC 19:00) | Removes soft-deleted records + Storage objects older than 7 days |
 | **Keep Supabase Alive** | Weekly (Sunday UTC 0:00) | Pings Supabase REST API to prevent free-tier hibernation |
-| **Check Current Team** | Weekly (Monday JST 19:00) | Scrapes kyureki.com + hb-nippon.com for new games, updates senseki.json, auto-creates PR |
+| **Check Current Team** | Weekly (Monday JST 19:00) | Scrapes kyureki.com + hb-nippon.com for new games, inserts into Supabase, creates Issue |
 | **Update README Stats** | Push to master / manual | Auto-update project stats + 3-repo sync (see below) |
 
 **3-Repo Auto Stats Sync**: `update-readme-stats.yml` がコード変更時にプロジェクト統計（ファイル数・LOC・ページ数・戦績数など10指標）を算出し、3つのリポジトリに自動反映する。
@@ -466,7 +468,7 @@ Admin (4 pages)
 旧公式サイト（FC2）から段階的に情報を移管。
 
 - **Completed**: OB会概要・設立趣旨、活動内容、校歌・応援歌、関連リンク、OB会規約（全15条+付則）
-- **Data migrated**: 歴代戦績 <!--stat:senseki-->681<!--/stat-->試合 (1955-2026) -> `data/senseki.json` (41% verified)
+- **Data migrated**: 歴代戦績 <!--stat:senseki-->681<!--/stat-->試合 (1955-2026) -> Supabase `history_matches` table (editable by editor+)
 - **Data migrated**: マスターズ甲子園過去戦績 20試合 (2011-2024) -> `results` table
 - **Photos migrated**: FC2 event thumbnails 15枚 (2010-2012) -> Supabase Storage
 - **Data migrated**: ゴルフコンペ結果 31回分 (第1回〜第31回、第19回欠番で30件) -> `golf_competitions` table
