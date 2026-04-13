@@ -197,10 +197,10 @@ Open-Meteo API（無料）を使った球場別天気予報。予定との連動
 Supabase `history_matches` テーブルに<!--stat:senseki-->681<!--/stat-->試合分の戦績データを格納。FC2旧サイトからのパース、外部ソースとの突合検証を経て構築。サイト上からeditor以上が直接編集可能。
 
 - <!--stat:senseki-->681<!--/stat--> games in `history_matches` table with DB sequence for auto-ID
-- **Inline editing on detail page**: Editors can fix scores, venues, opponents directly
-- **Update tracking**: `updated_by` / `updated_at` recorded by DB trigger, displayed on cards and detail pages
+- **Inline editing on detail page**: Editors can fix scores, venues, opponents directly on `/history/[id]`
+- **Update tracking**: `updated_by` / `updated_at` recorded by DB trigger, displayed as "✏️ XX期 名前 · 日付"
 - Cross-referenced with multiple external sources
-- Dynamic sitemap generation for all <!--stat:senseki-->681<!--/stat--> game detail pages
+- Dynamic sitemap generation for all <!--stat:senseki-->681<!--/stat--> game detail pages (with `lastModified` from `updated_at`)
 - Photo linkage per game (uploaded via admin UI)
 - **Generation-based grouping (期)**: Records grouped by graduating class (e.g., 47期 = 2001 autumn → 2002 summer), newest-first within each tournament, rematches labeled with original round name
 - **Nested collapsible UI**: Generation → tournament type (選手権/市長杯/春季/秋季, newest first) with win/loss stats per group
@@ -210,7 +210,8 @@ Supabase `history_matches` テーブルに<!--stat:senseki-->681<!--/stat-->試�
 外部CMSを使わず、**Supabase + Next.js で構築した独自CMS**。ソフトデリート、変更履歴、監査ログを標準装備。
 
 - **9 editor pages**: Results, Schedule, Announcements, Media, Masters, History, Dues, Members Posts, Golf
-- **Inline editing**: Edit content directly on detail pages (no page transition)
+- **Inline editing**: Edit content directly on detail pages including historical game records (no page transition)
+- **Update tracking**: All tables have `updated_by` (auto-set by DB trigger via `auth.uid()`), displayed on detail pages as "✏️ XX期 名前 · 日付"
 - **Venue maps**: Google Maps Embed API (place mode) on schedule/results detail pages, with navigation buttons. Editors can override map search query via `venue_map_query` field
 - **Inline photo upload**: Upload photos from any detail page
 - **Soft delete + 7-day trash**: All content tables including `dues_payments` support soft delete, auto-purge via scheduled GitHub Actions
@@ -266,6 +267,9 @@ user_roles ----< results         (author)
     +-- golf_competitions        (golf competition results, 30 records)
     +-- *_history (x5)           (auto-saved on UPDATE/DELETE)
 
+history_matches                  (681 games, 1955-2026, editable by editor+)
+    +-- history_matches_history  (auto-saved on UPDATE/DELETE)
+
 photos ----< results | schedule | announcements | history | tournament(year+type)
 videos ----< results | schedule | announcements
 
@@ -297,7 +301,9 @@ Storage buckets:
 | `audit_logs` | Audit trail (privilege changes, soft deletes via DB trigger) |
 | `bookmarks` | User bookmarks (RLS: self-only) |
 | `golf_competitions` | Golf competition results (30 records, score PDFs via documents/ bucket). Soft delete |
-| `*_history` (x5) | Change history (auto-saved on UPDATE/DELETE via DB trigger) |
+| `history_matches` | Historical game records (681 games, 1955-2026, editable by editor+). DB sequence for auto-ID |
+| `*_history` (x6) | Change history (auto-saved on UPDATE/DELETE via DB trigger) |
+| `daily_messages` | Daily greeting messages (date+slot composite PK) |
 
 ### DB Functions & Triggers
 
@@ -314,8 +320,8 @@ Storage buckets:
 ### Key Design Decisions
 
 - **Soft delete** on all content tables including `dues_payments` (`deleted_at` column) with 7-day auto-purge
-- **DB triggers** for `updated_at`, audit logging, and history snapshots
-- **Views** (`*_with_author`) join author display names with `deleted_at IS NULL` filter
+- **DB triggers** for `updated_at`, `updated_by` (server-side via `auth.uid()`), audit logging, and history snapshots
+- **Views** (`*_with_author`) join author display names + `updated_by` with `deleted_at IS NULL` filter
 - **DB functions** for RLS: `get_user_role()`, `is_admin()`, `is_editor_or_above()`, `is_member_or_above()`
 - **`venue_map_query`** on schedule/results: editors can override Google Maps search query when venue name is ambiguous
 - **32 versioned migrations** in `supabase/migrations/`
@@ -332,6 +338,7 @@ Storage buckets:
 | **Keep Supabase Alive** | Weekly (Sunday UTC 0:00) | Pings Supabase REST API to prevent free-tier hibernation |
 | **Check Current Team** | Weekly (Monday JST 19:00) | Scrapes kyureki.com + hb-nippon.com for new games, inserts into Supabase, creates Issue |
 | **Update README Stats** | Push to master / manual | Auto-update project stats + 3-repo sync (see below) |
+| **Daily Message** | 6 crons (3 primary + 3 backfill) / manual | Generates greeting messages via Gemini 2.5 Flash + weather. Backfill crons 3h after each slot ensure delivery even if primary cron misfires |
 
 **3-Repo Auto Stats Sync**: `update-readme-stats.yml` がコード変更時にプロジェクト統計（ファイル数・LOC・ページ数・戦績数など10指標）を算出し、3つのリポジトリに自動反映する。
 
@@ -393,7 +400,7 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 - **Share button**: Web Share API (mobile native share sheet) with LINE fallback (desktop). On all 4 detail pages
 - **Google Calendar button**: One-tap calendar registration from schedule detail (URL scheme, no API key)
 - **Weather forecast**: Auto-display weather on schedule detail pages (3 days before game). Venue master (10 stadiums with geocoded coordinates). Standalone `/weather` page with expandable venue cards: 3-day forecast with day-of-week labels, daily tap to switch hourly strip, precipitation probability bars (blue gradient), precipitation icons follow mainstream weather app conventions (hidden below 20%, ☔ at 20%+, ❄️ for snow, ⚡ for thunder), wind speed in m/s with strength color coding (穏やか/やや強/強風) on both daily and hourly views, Google Maps integration. **Humidity** displayed on main card (気温/湿度/降水を縦並びで表示), hourly cells (`湿XX%`, varies by hour), and daily 3-col cards (今日/明日/明後日 max/min, computed from hourly since Open-Meteo daily lacks humidity aggregate). **WBGT (熱中症指数) warning**: `0.725*T + 0.0368*RH + 0.00364*T*RH - 4.25` 式で算出し、日本スポーツ協会基準で 注意(21+)/警戒(25+)/厳重警戒(28+)/危険(31+) のバナー表示。Color-coded weather icons per weather group (sun=amber, cloud=gray, rain=blue, snow=sky, thunder=yellow), automatic light/dark mode via CSS variables. Open-Meteo API (free, no key, `wind_speed_unit=ms`, `relative_humidity_2m`), 30-min ISR cache
-- **Daily greeting (朝/昼/夜のひとこと)**: Gemini 2.5 Flash + Grounded Web Search で 1日3回（JST 6:00/12:00/18:00、GitHub Actions cron）、横浜スタジアム座標の Open-Meteo 実天気 + その日の記念日を元に 80字前後の挨拶メッセージを自動生成し `daily_messages` テーブルに保存。トップページは現在時刻からスロット判定（朝6-12/昼12-18/夜18-6）。冪等チェック + 日次サーキットブレーカー10回 + `CRON_SECRET` Bearer 認証で多層防御。Gemini キーは billing 無効の GCP プロジェクトに restrict され無料枠超過時は 429（課金不可）。プロ野球ニュースなど不確実な情報は禁止、歴史上の記念日のみ許可、スロット別トーン指示（朝=未来形/昼=現在進行/夜=完了形）
+- **Daily greeting (朝/昼/夜のひとこと)**: Gemini 2.5 Flash + Grounded Web Search で 1日3回（JST 6:00/12:00/18:00、GitHub Actions cron）、横浜スタジアム座標の Open-Meteo 実天気 + その日の記念日を元に 80字前後の挨拶メッセージを自動生成し `daily_messages` テーブルに保存。トップページは現在時刻からスロット判定（朝6-12/昼12-18/夜18-6）。冪等チェック + 日次サーキットブレーカー10回 + `CRON_SECRET` Bearer 認証で多層防御。Gemini キーは billing 無効の GCP プロジェクトに restrict され無料枠超過時は 429（課金不可）。プロ野球ニュースなど不確実な情報は禁止、歴史上の記念日のみ許可、スロット別トーン指示（朝=未来形/昼=現在進行/夜=完了形）。**補完cron**: 各スロットの3時間後（JST 09:00/15:00/21:00）にバックフィルcronを配置し、GitHub Actions cronの遅延・不発に対応。スロット判定は `github.event.schedule` ベースで遅延実行でも正確
 - **LINE browser support**: Auto-detect LINE in-app browser on login — redirects to external browser for Google OAuth compatibility
 - **Safe delete UX**: Delete buttons are hidden from list views entirely — only accessible after entering edit mode or a dedicated select mode, always followed by a confirmation modal. Uses a high-visibility red button with 🗑 icon in the edit form header for clear discoverability in both light and dark mode
 - Scroll-to-top floating button
