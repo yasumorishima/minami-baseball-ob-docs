@@ -188,6 +188,7 @@ Open-Meteo API（無料）を使った球場別天気予報。予定との連動
 - **Humidity display**: Open-Meteo の `relative_humidity_2m` を取得し、メインカードで気温/湿度/降水を縦並び表示、時間別セルに `湿XX%`、3日カード（今日/明日/明後日）に max/min を表示。Open-Meteo の daily endpoint に湿度集計はないため、hourly から日毎の最大/最小を算出
 - **WBGT (熱中症指数) warning**: 気温と湿度から `0.725*T + 0.0368*RH + 0.00364*T*RH - 4.25` で算出し、日本スポーツ協会の運動指針に沿って 注意(21+)/警戒(25+)/厳重警戒(28+)/危険(31+) のバナーを表示。屋外練習・試合の熱中症リスクを当日朝に判断できる
 - **Accurate Japanese WMO labels**: code 2 = 晴れ時々くもり (previously inverted as くもり時々晴れ), code 53 = 霧雨 (previously collided with code 63 rain), code 48 = 凍る霧 (previously mislabeled as 霧氷 which means rime ice on objects)
+- **Composite daily label + transition icons**: 3時間刻み(6/9/12/15/18/21時)サンプルから AM(6,9) / PM(12,15,18,21) の多数派を取り、AM≠PM なら「Aのち B」(例: 雨のち晴れ)、AM=PM で降水系が2スロット以上なら「主時々雨」と合成。「のち」表示時は2アイコンを矢印で並べて遷移を視覚化（「雨のち晴れ」→ ☔ → ☀️）。降水/湿度/風速の日別集計も同じ3時間刻みサンプルから算出するので、ラベル・アイコン・数値が完全に整合する。優先度: 雷>雪>雨>曇>晴で同数時に重要側を採用、晴/曇のバリエーションは情報価値が低いため「時々」化しない
 - **Enlarged mobile hourly icons** (16 → 40 px) so composite icons like 晴れ時々くもり are actually distinguishable
 - **30-min ISR cache** via `next.revalidate` to avoid excessive API calls
 - Smooth card expand/collapse animation with scroll position correction
