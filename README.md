@@ -74,7 +74,7 @@
                                   v
                          +-----------------+
                          |  Vercel API     |
-                         |  /api/gas-proxy |  (GITHUB_PAT centralized here)
+                         |  /api/gas-proxy |  (GitHub App minami-baseball-ob-bot)
                          +--------+--------+
                                   | repository_dispatch
                                   v
@@ -153,7 +153,7 @@ Google Forms から PR 作成、マージで権限反映まで、**個人情報�
 ```
 Google Form submit
   -> Google Apps Script (HMAC-signed call to Vercel proxy)
-    -> Vercel /api/gas-proxy/dispatch (GITHUB_PAT centralized in Vercel env)
+    -> Vercel /api/gas-proxy/dispatch (GitHub App minami-baseball-ob-bot via Installation token)
       -> GitHub repository_dispatch
         -> GitHub Actions: auto-create PR (UUID + graduation year only)
         -> Supabase API: store display_name directly (bypass Git)
@@ -387,7 +387,8 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 | **Account deletion** | Users can fully delete their account (auth + user_roles) |
 | **Data export** | Users can download their data as JSON |
 | **Structured logging** | JSON logs in API routes for Vercel dashboard filtering |
-| **Secret centralization** | GITHUB_PAT kept only in Vercel env (Sensitive). GAS authenticates to Vercel proxy via HMAC `WEBHOOK_SECRET`, never holding the PAT itself. Fine-grained PAT with 90-day expiration + monitoring workflow (`check-pat-expiration.yml`) |
+| **GitHub App authentication** | Classic PAT を廃止し `minami-baseball-ob-bot` GitHub App の Installation token 方式へ移行。Private Key は恒久（カレンダー駆動ローテ不要、漏洩時のみインシデント駆動で再生成）、Installation token は 1h 自動更新、permission は Contents R/W + Issues R/W のみ（旧 `repo` scope より narrow）。`lib/github/app-auth.ts` で 5 route 共通 helper 化 |
+| **Secret centralization** | GAS は Vercel proxy に HMAC `WEBHOOK_SECRET` で authenticate するのみで GitHub 認証情報を保持しない。サーバ側クレデンシャルは Vercel env (Sensitive) に集約 |
 | **Audit logs** | All privilege changes and deletions auto-recorded via DB triggers |
 
 ---
