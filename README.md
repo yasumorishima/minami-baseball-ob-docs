@@ -57,6 +57,7 @@
 | Maps | **Google Maps Embed API** (venue maps with navigation links) |
 | Weather | **Open-Meteo API** (free, no API key, 30-min ISR cache) |
 | Testing | **Playwright** (e2e: skeleton/navigation/weather/screenshot) |
+| GitHub integration | **GitHub App `minami-baseball-ob-bot`** (Installation token via `@octokit/auth-app`, PAT-less) |
 | External | **Google Apps Script** (Member form dispatch + feedback Gmail notification) |
 
 ---
