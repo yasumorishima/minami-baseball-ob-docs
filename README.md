@@ -65,15 +65,20 @@
 
 ```
                          +-----------------+
-                         |   Google Forms  |
-                         | (Member/Issue)  |
+                         |  Google Form    |
+                         |  (Member)       |
                          +--------+--------+
                                   |
                          Google Apps Script
-                                  |
-                    repository_dispatch / Issues API
-                                  |
-     +----------------------------v----------------------------+
+                                  | HMAC (WEBHOOK_SECRET)
+                                  v
+                         +-----------------+
+                         |  Vercel API     |
+                         |  /api/gas-proxy |  (GITHUB_PAT centralized here)
+                         +--------+--------+
+                                  | repository_dispatch
+                                  v
+     +----------------------------+----------------------------+
      |                     GitHub Actions                      |
      |  member-request  sync-roles  purge  check-team  stats  |
      +---+---------------------+-------------------------------+
@@ -147,11 +152,13 @@ Google Forms から PR 作成、マージで権限反映まで、**個人情報�
 
 ```
 Google Form submit
-  -> Google Apps Script (repository_dispatch)
-    -> GitHub Actions: auto-create PR (UUID + graduation year only)
-    -> Supabase API: store display_name directly (bypass Git)
-      -> Admin merges PR
-        -> GitHub Actions: sync config/members.yml -> Supabase user_roles
+  -> Google Apps Script (HMAC-signed call to Vercel proxy)
+    -> Vercel /api/gas-proxy/dispatch (GITHUB_PAT centralized in Vercel env)
+      -> GitHub repository_dispatch
+        -> GitHub Actions: auto-create PR (UUID + graduation year only)
+        -> Supabase API: store display_name directly (bypass Git)
+          -> Admin merges PR
+            -> GitHub Actions: sync config/members.yml -> Supabase user_roles
 ```
 
 - Personal names are stored **only in Supabase** (never in Git history)
@@ -333,7 +340,7 @@ Storage buckets:
 
 | Workflow | Trigger | What it does |
 |----------|---------|-------------|
-| **Member Request PR** | Google Form (via GAS `repository_dispatch`) | Auto-creates PR with role config, stores name in Supabase directly |
+| **Member Request PR** | Google Form (GAS → Vercel proxy `/api/gas-proxy/dispatch` → `repository_dispatch`) | Auto-creates PR with role config, stores name in Supabase directly |
 | **Sync Member Roles** | Push to `config/members.yml` | Parses YAML, updates Supabase `user_roles`, demotes unlisted users |
 | **Purge Deleted Records** | Daily (UTC 19:00) | Removes soft-deleted records + Storage objects older than 7 days |
 | **Keep Supabase Alive** | Weekly (Sunday UTC 0:00) | Pings Supabase REST API to prevent free-tier hibernation |
@@ -357,8 +364,8 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 
 | Script | Purpose |
 |--------|---------|
-| `gas-member-form/` | Member signup form -> `repository_dispatch` -> PR auto-creation |
-| `gas-issue-form/` | Feedback/bug report form -> GitHub Issue with labels + image upload |
+| `gas-member-form/` | Member signup form → Vercel proxy `/api/gas-proxy/dispatch` → PR auto-creation (HMAC `WEBHOOK_SECRET`, no PAT in GAS) |
+| `gas-issue-form/` | *Legacy.* Replaced by in-app `/feedback` page; Google Form not publicly linked. Operational via Vercel proxy `/api/gas-proxy/issue` + `/api/gas-proxy/upload-image` for backward compatibility |
 
 ---
 
@@ -380,6 +387,7 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 | **Account deletion** | Users can fully delete their account (auth + user_roles) |
 | **Data export** | Users can download their data as JSON |
 | **Structured logging** | JSON logs in API routes for Vercel dashboard filtering |
+| **Secret centralization** | GITHUB_PAT kept only in Vercel env (Sensitive). GAS authenticates to Vercel proxy via HMAC `WEBHOOK_SECRET`, never holding the PAT itself. Fine-grained PAT with 90-day expiration + monitoring workflow (`check-pat-expiration.yml`) |
 | **Audit logs** | All privilege changes and deletions auto-recorded via DB triggers |
 
 ---
