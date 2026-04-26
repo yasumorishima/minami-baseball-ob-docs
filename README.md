@@ -346,10 +346,10 @@ Storage buckets:
 | **Purge Deleted Records** | Daily (UTC 19:00) | Removes soft-deleted records + Storage objects older than 7 days |
 | **Keep Supabase Alive** | Weekly (Sunday UTC 0:00) | Pings Supabase REST API to prevent free-tier hibernation |
 | **Check Current Team** | Weekly (Monday JST 19:00) | Scrapes kyureki.com + hb-nippon.com for new games, inserts into Supabase, creates Issue |
-| **Update README Stats** | Push to master / manual | Auto-update project stats + 3-repo sync (see below) |
+| **Update README Stats** | Monthly (1st of month, JST 09:00) / manual | Auto-update project stats + 3-repo sync (see below) |
 | **Daily Message** | 6 crons (3 primary + 3 backfill) / manual | Generates greeting messages via Gemini 2.5 Flash + weather. Backfill crons 3h after each slot ensure delivery even if primary cron misfires. Final step also warms `/weather` so the shared fetch Data Cache (all 10 venues) stays fresh for `/schedule` / `/schedule/[id]` |
 
-**3-Repo Auto Stats Sync**: `update-readme-stats.yml` がコード変更時にプロジェクト統計（ファイル数・LOC・ページ数・戦績数など10指標）を算出し、3つのリポジトリに自動反映する。
+**3-Repo Auto Stats Sync**: `update-readme-stats.yml` が毎月1日（JST 09:00）または手動実行でプロジェクト統計（ファイル数・LOC・ページ数・戦績数など10指標）を算出し、3つのリポジトリに自動反映する。
 
 ```
 scripts/update-readme-stats.sh
