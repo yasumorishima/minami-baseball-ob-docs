@@ -2,7 +2,7 @@
 
 <img src="icon.png" alt="南高校章" width="64">
 
-マスターズ甲子園への挑戦を続ける横浜市立南高校 野球部OB会の公式Webアプリケーション。試合結果・予定管理、1955年からの歴代戦績<!--stat:senseki-->0<!--/stat-->試合のデータベース、会員管理、写真ギャラリーなどを、5段階の権限制御のもとで運用しています。
+マスターズ甲子園への挑戦を続ける横浜市立南高校 野球部OB会の公式Webアプリケーション。試合結果・予定管理、1955年からの歴代戦績<!--stat:senseki-->683<!--/stat-->試合のデータベース、会員管理、写真ギャラリーなどを、5段階の権限制御のもとで運用しています。
 
 **https://minami-baseball-ob.vercel.app/** | ソースコード: private
 
@@ -124,7 +124,7 @@
 | DB tables (+ history) | <!--stat:tables_main-->16<!--/stat--> + <!--stat:tables_hist-->6<!--/stat--> |
 | DB migrations | <!--stat:migrations-->39<!--/stat--> |
 | GitHub Actions workflows | <!--stat:workflows-->7<!--/stat--> |
-| Historical game records | <!--stat:senseki-->0<!--/stat--> (1955-2026) |
+| Historical game records | <!--stat:senseki-->683<!--/stat--> (1955-2026) |
 <!-- stats-end -->
 
 ---
@@ -203,13 +203,13 @@ Open-Meteo API（無料）を使った球場別天気予報。予定との連動
 
 ### Historical Game Database (1955-2026)
 
-Supabase `history_matches` テーブルに<!--stat:senseki-->0<!--/stat-->試合分の戦績データを格納。FC2旧サイトからのパース、外部ソースとの突合検証を経て構築。サイト上からeditor以上が直接編集可能。
+Supabase `history_matches` テーブルに<!--stat:senseki-->683<!--/stat-->試合分の戦績データを格納。FC2旧サイトからのパース、外部ソースとの突合検証を経て構築。サイト上からeditor以上が直接編集可能。
 
-- <!--stat:senseki-->0<!--/stat--> games in `history_matches` table with DB sequence for auto-ID
+- <!--stat:senseki-->683<!--/stat--> games in `history_matches` table with DB sequence for auto-ID
 - **Inline editing on detail page**: Editors can fix scores, venues, opponents directly on `/history/[id]`
 - **Update tracking**: `updated_by` / `updated_at` recorded by DB trigger, displayed as "✏️ XX期 名前 · 日付"
 - Cross-referenced with multiple external sources
-- Dynamic sitemap generation for all <!--stat:senseki-->0<!--/stat--> game detail pages (with `lastModified` from `updated_at`)
+- Dynamic sitemap generation for all <!--stat:senseki-->683<!--/stat--> game detail pages (with `lastModified` from `updated_at`)
 - Photo linkage per game (uploaded via admin UI)
 - **Generation-based grouping (期)**: Records grouped by graduating class (e.g., 47期 = 2001 autumn → 2002 summer), newest-first within each tournament, rematches labeled with original round name
 - **Nested collapsible UI**: Generation → tournament type (選手権/市長杯/春季/秋季, newest first) with win/loss stats per group
@@ -433,7 +433,7 @@ Public (17 pages)
   /announcements           News
   /announcements/[id]      News detail
   /gallery                 Photo/video gallery (folder view)
-  /history                 Historical records 1955-2026 (<!--stat:senseki-->0<!--/stat--> games)
+  /history                 Historical records 1955-2026 (<!--stat:senseki-->683<!--/stat--> games)
   /history/[id]            Historical game detail
   /search                  Cross-table full-text search
   /weather                 Venue weather forecast (10 venues, 3-day + hourly)
@@ -486,7 +486,7 @@ Admin (4 pages)
 旧公式サイト（FC2）から段階的に情報を移管。
 
 - **Completed**: OB会概要・設立趣旨、活動内容、校歌・応援歌、関連リンク、OB会規約（全15条+付則）
-- **Data migrated**: 歴代戦績 <!--stat:senseki-->0<!--/stat-->試合 (1955-2026) -> Supabase `history_matches` table (editable by editor+)
+- **Data migrated**: 歴代戦績 <!--stat:senseki-->683<!--/stat-->試合 (1955-2026) -> Supabase `history_matches` table (editable by editor+)
 - **Data migrated**: マスターズ甲子園過去戦績 20試合 (2011-2024) -> `results` table
 - **Photos migrated**: FC2 event thumbnails 15枚 (2010-2012) -> Supabase Storage
 - **Data migrated**: ゴルフコンペ結果 31回分 (第1回〜第31回、第19回欠番で30件) -> `golf_competitions` table
