@@ -380,7 +380,7 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 | **Workflow permissions** | Every GitHub Actions workflow declares minimal permissions |
 | **CODEOWNERS** | `.github/workflows/`, `config/`, `supabase/` require admin review |
 | **Branch protection** | Direct push to master blocked, PR + CODEOWNERS required |
-| **Secret scanning** | Push protection enabled |
+| **Source secret leak prevention** | `gitleaks` GHA (`.github/workflows/gitleaks.yml`) scans the full git history on every PR / `master` push / manual dispatch. The gitleaks binary is SHA256-verified at install time to lock the supply chain. `.gitleaks.toml` allowlists only `NEXT_PUBLIC_*` placeholders and example files. Designed as an enforced defense against the Money Forward 2026-05-01 incident pattern, where source-code-embedded credentials forced a mass invalidation and reissue. GitHub native Secret Scanning is paid-only on private repos, so gitleaks substitutes for the same goal |
 | **Dependabot** | Vulnerability auto-detection |
 | **Privacy-first membership** | Personal names never appear in Git history (UUID + graduation year only) |
 | **Cookie consent** | GA4 script loads only after explicit user consent |
@@ -391,6 +391,8 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 | **GitHub App authentication** | Classic PAT を廃止し `minami-baseball-ob-bot` GitHub App の Installation token 方式へ移行。Private Key は恒久（カレンダー駆動ローテ不要、漏洩時のみインシデント駆動で再生成）、Installation token は 1h 自動更新、permission は Contents R/W + Issues R/W のみ（旧 `repo` scope より narrow）。`lib/github/app-auth.ts` で 5 route 共通 helper 化 |
 | **Secret centralization** | GAS は Vercel proxy に HMAC `WEBHOOK_SECRET` で authenticate するのみで GitHub 認証情報を保持しない。サーバ側クレデンシャルは Vercel env (Sensitive) に集約 |
 | **Audit logs** | All privilege changes and deletions auto-recorded via DB triggers |
+| **Audit log tamper resistance** | `audit_logs_insert` RLS policy uses `WITH CHECK (user_id = auth.uid())` (migration `20260502_audit_logs_insert_self_only.sql`). Authenticated users cannot spoof other users' audit entries by passing arbitrary `user_id`. `SECURITY DEFINER` triggers (`log_user_roles_change` / `log_soft_delete`) continue to record `auth.uid()` correctly because the policy is satisfied. `service_role` server-side inserts bypass RLS as designed |
+| **Secrets rotation runbook** | `DEVELOPMENT.md` includes a "Secrets Rotation" section documenting per-key rotation steps for `SUPABASE_SERVICE_ROLE_KEY` / Supabase JWT secret / `GITHUB_APP_PRIVATE_KEY` / `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` / `FEEDBACK_GAS_SECRET` / `GEMINI_API_KEY`. Includes a 4-step leak response checklist, recommended rotation cadence, and guidance on the Supabase new API key system (`sb_publishable_*` / `sb_secret_*`, introduced 2024/11) vs the Legacy JWT migration |
 | **Image optimization abuse defense** | `robots.txt` blocks 25 AI/scraper bots (Meta-ExternalAgent, GPTBot, ClaudeBot, Google-Extended, CCBot, Bytespider, PerplexityBot, etc.) with `Disallow: /`, plus `/_next/image` for all crawlers. All Supabase Storage `<Image>` sites use `unoptimized` so transforms bypass Vercel's Image Optimization (Supabase already serves through its own CDN, so the second-pass optimization is pure cost). `images.minimumCacheTTL` is pinned to 1 year so any remaining transforms amortize across crawler revisits. Defends against the "AI crawler hammers `/_next/image` with millions of unique transform requests" abuse pattern reported in the OpenNext + Cloudflare Images community |
 
 ---
