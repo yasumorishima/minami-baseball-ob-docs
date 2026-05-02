@@ -391,6 +391,7 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 | **GitHub App authentication** | Classic PAT を廃止し `minami-baseball-ob-bot` GitHub App の Installation token 方式へ移行。Private Key は恒久（カレンダー駆動ローテ不要、漏洩時のみインシデント駆動で再生成）、Installation token は 1h 自動更新、permission は Contents R/W + Issues R/W のみ（旧 `repo` scope より narrow）。`lib/github/app-auth.ts` で 5 route 共通 helper 化 |
 | **Secret centralization** | GAS は Vercel proxy に HMAC `WEBHOOK_SECRET` で authenticate するのみで GitHub 認証情報を保持しない。サーバ側クレデンシャルは Vercel env (Sensitive) に集約 |
 | **Audit logs** | All privilege changes and deletions auto-recorded via DB triggers |
+| **Image optimization abuse defense** | `robots.txt` blocks 25 AI/scraper bots (Meta-ExternalAgent, GPTBot, ClaudeBot, Google-Extended, CCBot, Bytespider, PerplexityBot, etc.) with `Disallow: /`, plus `/_next/image` for all crawlers. All Supabase Storage `<Image>` sites use `unoptimized` so transforms bypass Vercel's Image Optimization (Supabase already serves through its own CDN, so the second-pass optimization is pure cost). `images.minimumCacheTTL` is pinned to 1 year so any remaining transforms amortize across crawler revisits. Defends against the "AI crawler hammers `/_next/image` with millions of unique transform requests" abuse pattern reported in the OpenNext + Cloudflare Images community |
 
 ---
 
