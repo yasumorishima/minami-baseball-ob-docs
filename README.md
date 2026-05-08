@@ -122,7 +122,7 @@
 | API routes | <!--stat:apis-->13<!--/stat--> |
 | Reusable components | <!--stat:components-->45<!--/stat--> |
 | DB tables (+ history) | <!--stat:tables_main-->16<!--/stat--> + <!--stat:tables_hist-->6<!--/stat--> |
-| DB migrations | <!--stat:migrations-->41<!--/stat--> |
+| DB migrations | <!--stat:migrations-->43<!--/stat--> |
 | GitHub Actions workflows | <!--stat:workflows-->8<!--/stat--> |
 | Historical game records | <!--stat:senseki-->681<!--/stat--> (1955-2026) |
 <!-- stats-end -->
