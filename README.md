@@ -221,12 +221,12 @@ Supabase `history_matches` テーブルに<!--stat:senseki-->681<!--/stat-->試�
 - **9 editor pages**: Results, Schedule, Announcements, Media, Masters, History, Dues, Members Posts, Golf
 - **Inline editing**: Edit content directly on detail pages including historical game records (no page transition)
 - **Update tracking**: All tables have `updated_by` (auto-set by DB trigger via `auth.uid()`), displayed on detail pages as "✏️ XX期 名前 · 日付"
-- **Venue maps**: Google Maps Embed API (place mode) on schedule/results detail pages, with navigation buttons. Editors can override map search query via `venue_map_query` field
+- **Venue maps**: Google Maps Embed API (place mode) on schedule/results detail pages, with Google Maps / Apple Maps navigation buttons. Resolution priority: row-level `venue_map_query` (manual override) > `lib/venues.ts` master via `matchVenue()` (10 stadiums incl. 南高/潮風/横浜スタジアム/横須賀/相模原/平塚/南足柄/大和引地台/等々力/新杉田) > raw `venue` text. Master is the primary source so admins don't need to fill `venue_map_query` for known venues, and alias matching auto-resolves variants (e.g. 南高ホール / 南高グラウンド → 横浜市立南高等学校)
 - **Inline photo upload**: Upload photos from any detail page
 - **Soft delete + 7-day trash**: All content tables including `dues_payments` support soft delete, auto-purge via scheduled GitHub Actions
 - **Change history**: DB triggers auto-save previous versions on UPDATE/DELETE
 - **Audit logs**: All privilege changes and deletions are recorded
-- **Bidirectional linking**: Schedule <-> Results linked by `schedule_id`, photos shared across both
+- **Bidirectional linking**: Schedule <-> Results linked by `schedule_id`, photos shared across both. Announcements can also link to a schedule entry (`announcements.schedule_id`) — the announcement detail page shows a「予定/試合 詳細を見る」 button, the schedule list view auto-displays the linked result score badge, and the edit form provides a dropdown to pick a schedule
 - **Current team game detection**: Automated scraping from 2 sources (kyureki.com + hb-nippon.com) detects new games, inserts directly into Supabase `history_matches`, and creates GitHub Issue for review
 - **Tournament photos**: Per-tournament photo section with `tournament_year` + `tournament_type` composite key
 - **Safe delete UX (site-wide)**: Delete buttons are never shown on list cards or photo thumbnails. They live inside edit forms at the header (high-visibility red button with 🗑 icon, works in both light and dark mode) or behind a select mode (photos), always followed by a confirmation modal. Covers edit pages, inline edit on detail pages, members-only inline edit, edit/dues, edit/masters documents, and PDF unlink actions — every destructive action has a confirmation step
