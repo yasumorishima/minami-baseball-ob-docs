@@ -473,10 +473,13 @@ Admin (4 pages)
 
 | Element | Value |
 |---------|-------|
-| Primary color | Maroon `#7b2234` (team color) |
+| Background (light) | Warm cream `#fff7ed` + section-alt `#fef3c7` + border `#fed7aa` (2026-05-12 yokohama-funnies から配色のみ移植、フォントは Noto Sans JP のまま据置) |
+| Background (dark) | Warm dark `#1a1410` + card `#2a2520` + section-alt `#211a14` + border `#4a3a28` |
+| Primary color | Maroon `#7b2234` (team color, 据置) |
 | Dark mode accent | Dusty rose `#d08090` |
 | Footer background | Dark maroon `#3d1520` |
-| Mobile font | 18px / line-height 1.7 |
+| Mobile font | 18px / line-height 1.7 (body) |
+| Mobile fine-print | `.text-xs 14px` / `.text-sm 16px` / `.text-base 17px` (<640px、シニア OB 向け読みやすさ底上げ) |
 | Layout | Mobile-first, bottom navigation on mobile |
 | CSS Architecture | Tailwind CSS 4 `@theme` with CSS variables for light/dark |
 | Icons | Custom pixel art mascots (pitcher, batter, fielder) |
