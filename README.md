@@ -55,7 +55,7 @@
 | CI/CD | **GitHub Actions** (7 workflows; 全 workflow RPi5 self-hosted ARM64、 hosted 残置は gcp-cost-monitor のみ) |
 | Analytics | **Google Analytics 4** (Cookie consent gate) |
 | Maps | **Google Maps Embed API** (venue maps with navigation links) |
-| Weather | **Open-Meteo API** (free, no API key, 30-min ISR cache + 3h cron warm to avoid stale drift) |
+| Weather | **Open-Meteo API** (free, no API key, 30-min ISR cache + 30-min external cron warm to keep all 10 venues fresh for the first morning visitor) |
 | Testing | **Playwright** (e2e: skeleton/navigation/weather/screenshot) |
 | GitHub integration | **GitHub App `minami-baseball-ob-bot`** (Installation token via `@octokit/auth-app`, PAT-less) |
 | External | **Google Apps Script** (Member form dispatch + feedback Gmail notification) |
@@ -347,7 +347,7 @@ Storage buckets:
 | **Keep Supabase Alive** | Weekly (Sunday UTC 0:00) | Pings Supabase REST API to prevent free-tier hibernation |
 | **Check Current Team** | Weekly (Monday JST 19:00) | Scrapes kyureki.com + hb-nippon.com for new games, inserts into Supabase, creates Issue |
 | **Update README Stats** | Monthly (1st of month, JST 09:00) / manual | Auto-update project stats + 3-repo sync (see below) |
-| **Daily Message** | 6 crons (3 primary + 3 backfill) / manual | Generates greeting messages via Gemini 2.5 Flash + weather. Backfill crons 3h after each slot ensure delivery even if primary cron misfires. Final step also warms `/weather` so the shared fetch Data Cache (all 10 venues) stays fresh for `/schedule` / `/schedule/[id]` |
+| **Daily Message** | 6 crons (3 primary + 3 backfill) / manual | Generates greeting messages via Gemini 2.5 Flash + weather. Backfill crons 3h after each slot ensure delivery even if primary cron misfires. Cache warming is handled separately by a dedicated 30-min external cron (see Weather row) |
 
 **3-Repo Auto Stats Sync**: `update-readme-stats.yml` が毎月1日（JST 09:00）または手動実行でプロジェクト統計（ファイル数・LOC・ページ数・戦績数など10指標）を算出し、3つのリポジトリに自動反映する。
 
