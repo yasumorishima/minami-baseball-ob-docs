@@ -4,7 +4,7 @@
 
 マスターズ甲子園への挑戦を続ける横浜市立南高校 野球部OB会の公式Webアプリケーション。試合結果・予定管理、1955年からの歴代戦績<!--stat:senseki-->681<!--/stat-->試合のデータベース、会員管理、写真ギャラリーなどを、5段階の権限制御のもとで運用しています。
 
-**https://minami-baseball-ob.vercel.app/** | ソースコード: private
+**https://minami-baseball-ob.vercel.app/** | ソースコード: private | 公開 cron workflow: [minami-public-cron](https://github.com/yasumorishima/minami-public-cron)
 
 ---
 
