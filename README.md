@@ -52,7 +52,7 @@
 | Auth | **Supabase Auth** (Google OAuth / SSR cookie pattern) |
 | Storage | **Supabase Storage** (photos + videos + member docs + golf score PDFs, client-side resize) |
 | Hosting | **Vercel** (git push auto-deploy) |
-| CI/CD | **GitHub Actions** (7 workflows; 全 workflow RPi5 self-hosted ARM64、 hosted 残置は gcp-cost-monitor のみ) |
+| CI/CD | **GitHub Actions** (private = 8 workflows on RPi5 self-hosted ARM64 + 公開 cron mirror [minami-public-cron](https://github.com/yasumorishima/minami-public-cron) で 2 workflow on ubuntu-latest; hosted 残置 = gcp-cost-monitor のみ) |
 | Analytics | **Google Analytics 4** (Cookie consent gate) |
 | Maps | **Google Maps Embed API** (venue maps with navigation links) |
 | Weather | **Open-Meteo API** (free, no API key, 30-min ISR cache + 30-min external cron warm to keep all 10 venues fresh for the first morning visitor) |
