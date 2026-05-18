@@ -52,7 +52,7 @@
 | Auth | **Supabase Auth** (Google OAuth / SSR cookie pattern) |
 | Storage | **Supabase Storage** (photos + videos + member docs + golf score PDFs, client-side resize) |
 | Hosting | **Vercel** (git push auto-deploy) |
-| CI/CD | **GitHub Actions** (private = 8 workflows on RPi5 self-hosted ARM64 + 公開 cron mirror [minami-public-cron](https://github.com/yasumorishima/minami-public-cron) で 3 workflow on ubuntu-latest; hosted 残置 = gcp-cost-monitor のみ) |
+| CI/CD | **GitHub Actions** (private = 7 workflows on RPi5 self-hosted ARM64: check-current-team / daily-message / gitleaks / keep-alive / member-request / purge-deleted-photos / sync-roles; 公開 cron mirror [minami-public-cron](https://github.com/yasumorishima/minami-public-cron) で 4 workflow on ubuntu-latest: warm-weather / keep-alive / daily-message / update-readme-stats) |
 | Analytics | **Google Analytics 4** (Cookie consent gate) |
 | Maps | **Google Maps Embed API** (venue maps with navigation links) |
 | Weather | **Open-Meteo API** (free, no API key, 30-min ISR cache + 30-min external cron warm to keep all 10 venues fresh for the first morning visitor) |
@@ -94,8 +94,8 @@
                                                   |
                                          +--------v----------+
                                          |  Next.js 15 App   |
-                                         |  38 pages + 9 API |
-                                         |  41 components    |
+                                         |  38 pages + 13 API|
+                                         |  47 components    |
                                          +--------+----------+
                                                   |
                                +------------------+------------------+
@@ -348,17 +348,18 @@ Storage buckets:
 | **Purge Deleted Records** | Daily (UTC 19:00) | Removes soft-deleted records + Storage objects older than 7 days |
 | **Keep Supabase Alive** | Weekly (Sunday UTC 0:00) | Pings Supabase REST API to prevent free-tier hibernation |
 | **Check Current Team** | Weekly (Monday JST 19:00) | Scrapes kyureki.com + hb-nippon.com for new games, inserts into Supabase, creates Issue |
-| **Update README Stats** | Monthly (1st of month, JST 09:00) / manual | Auto-update project stats + 3-repo sync (see below) |
+| **Update README Stats** | (移行先: [minami-public-cron](https://github.com/yasumorishima/minami-public-cron) で ubuntu-latest 動作) Monthly (1st of month, JST 09:00) / manual | Auto-update project stats + 3-repo sync (see below) |
 | **Daily Message** | 6 crons (3 primary + 3 backfill) / manual | Generates greeting messages via Gemini 2.5 Flash + weather. Backfill crons 3h after each slot ensure delivery even if primary cron misfires. Cache warming is handled separately by a dedicated 30-min external cron (see Weather row) |
 
-**3-Repo Auto Stats Sync**: `update-readme-stats.yml` が毎月1日（JST 09:00）または手動実行でプロジェクト統計（ファイル数・LOC・ページ数・戦績数など10指標）を算出し、3つのリポジトリに自動反映する。
+**3-Repo Auto Stats Sync**: [`minami-public-cron`](https://github.com/yasumorishima/minami-public-cron) の `update-readme-stats.yml` (ubuntu-latest) が毎月1日（JST 09:00）または手動実行でプロジェクト統計（ファイル数・LOC・ページ数・戦績数・active_users・e2e_tests など14指標）を算出し、3つのリポジトリに自動反映する。 `DOCS_SYNC_PAT` で minami-baseball-ob を checkout、 Supabase REST (`history_matches`, `user_roles`) 集計 + ファイル走査。 HTTP non-2xx 時は marker を保持 (KEEP fail-safe で silent regression 防止)。
 
 ```
-scripts/update-readme-stats.sh
-  → README.md の <!--stat:xxx--> マーカーを更新
-    → private repo (minami-baseball-ob): commit & push
-    → public docs repo (minami-baseball-ob-docs): GitHub API で <!--stat:xxx--> マーカー + アーキテクチャ図の数値を更新
-    → profile repo (yasumorishima): GitHub API で <!--ob:xxx--> マーカーを更新
+minami-public-cron/scripts/update-readme-stats.sh (ubuntu-latest)
+  ↓ DOCS_SYNC_PAT で minami-baseball-ob を checkout (read-only 計測)
+計測結果を 3 repo に PUT (GitHub API):
+  → minami-baseball-ob (private): <!--stat:KEY-->...<!--/stat--> マーカー更新
+  → minami-baseball-ob-docs (public): 同上 + アーキテクチャ図の数値
+  → yasumorishima/yasumorishima (public profile): <!--ob:KEY-->...<!--/ob--> マーカー更新
 ```
 
 All workflows use **minimal `permissions`** (principle of least privilege).
