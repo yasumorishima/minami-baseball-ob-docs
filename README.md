@@ -404,6 +404,7 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 ## UX & Accessibility
 
 - Mobile-first responsive design (base font 18px, line-height 1.7)
+- **PC viewport typography scaling**: 全 page で `md:` (768px+) / `lg:` (1024px+) breakpoints で text size を段階的に拡大 (mobile/sm の見え方は keep)。 35+ files / 120+ commits で home / ticker / header / footer / 各 public page / 詳細 page / 認証 page 全てを PC ブラウザで可読性のあるサイズに調整
 - All touch targets >= 44px
 - Dark mode with team color accent (maroon `#7b2234` / dark rose `#d08090`)
 - `aria-label` on result badges (Win/Loss/Draw)
