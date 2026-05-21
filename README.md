@@ -52,7 +52,7 @@
 | Auth | **Supabase Auth** (Google OAuth / SSR cookie pattern) |
 | Storage | **Supabase Storage** (photos + videos + member docs + golf score PDFs, client-side resize) |
 | Hosting | **Vercel** (git push auto-deploy) |
-| CI/CD | **GitHub Actions** (private = 6 workflows on RPi5 self-hosted ARM64: check-current-team / gitleaks / keep-alive / member-request / purge-deleted-photos / sync-roles; 公開 cron [minami-public-cron](https://github.com/yasumorishima/minami-public-cron) で 4 workflow on ubuntu-latest: warm-weather / keep-alive / daily-message / update-readme-stats。 daily-message は 2026-05-21 から public-cron 側 `*/30` polling が primary、 self-hosted 版は disabled) |
+| CI/CD | **GitHub Actions** (private = 6 workflows on RPi5 self-hosted ARM64: check-current-team / gitleaks / keep-alive / member-request / purge-deleted-photos / sync-roles; 公開 cron [minami-public-cron](https://github.com/yasumorishima/minami-public-cron) で 4 workflow on ubuntu-latest: warm-weather / keep-alive / daily-message / update-readme-stats。 daily-message は 2026-05-21 から public-cron 側 `*/30` polling が primary (self-hosted 版は disabled) + **RPi5 cron `*/30 * * * *` polling を redundant path** として並行稼働、 GHA scheduler 極端遅延時の fallback、 API 冪等性で重複生成なし) |
 | Analytics | **Google Analytics 4** (Cookie consent gate) |
 | Maps | **Google Maps Embed API** (venue maps with navigation links) |
 | Weather | **Open-Meteo API** (free, no API key, 30-min ISR cache + 30-min external cron warm to keep all 10 venues fresh for the first morning visitor) |
