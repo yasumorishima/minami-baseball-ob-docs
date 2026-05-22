@@ -245,13 +245,13 @@ Supabase `history_matches` テーブルに<!--stat:senseki-->681<!--/stat-->試�
 
 ### Members-Only Content Management
 
-会員専用ページに5カテゴリの資料管理。PDF添付・年度別グルーピング・役員テーブル編集・ゴルフコンペ歴代結果を統合。
+会員専用ページを 6 サブページに分離 (4 カテゴリ + ゴルフコンペ + 登録メンバー)。 PDF添付・年度別グルーピング・役員テーブル編集・ゴルフコンペ歴代結果を統合。
 
-- **4 categories**: OB会総会 / 野球部支援 / 会計関係 / OB会役員
+- **6 sub-pages**: `/members-only/{sokai,shien,kaikei,yakuin,golf,members}` — 4 categories (OB会総会 / 野球部支援 / 会計関係 / OB会役員) + ゴルフコンペ + 登録メンバー (期別一覧)
 - **File attachments**: Upload to private `members-docs` bucket, download via signed URLs (5-min expiry)
 - **Fiscal year grouping**: OB会総会 and 会計関係 auto-group by Japanese fiscal year (April start) with wareki labels
 - **Officer table**: OB会役員 category renders as editable role/name/class table
-- **Inline CRUD**: Editors can create/edit/delete posts directly on the members-only page
+- **Inline CRUD per sub-page**: Editors create/edit/delete posts on each category sub-page (form is scoped to that page's fixed category)
 - **Golf competitions**: Dedicated page with 30 historical results, 25 score PDFs, inline editing per round, linked to schedule entries
 
 ### Search & Discovery
@@ -451,8 +451,13 @@ Auth (5 pages)
   /login                   Google OAuth login
   /account                 Profile, data export, cookie settings, account deletion
   /bookmarks               Saved articles
-  /members-only            Members-only content (5 categories, inline CRUD, file attachments)
+  /members-only            Hub: 6 sub-page navigation
+  /members-only/sokai      OB会総会 posts (fiscal year grouping)
+  /members-only/shien      野球部支援 posts
+  /members-only/kaikei     会計関係 posts (fiscal year grouping)
+  /members-only/yakuin     OB会役員 posts (editable role table)
   /members-only/golf       Golf competition history (30 results + score PDFs)
+  /members-only/members    登録メンバー (期別一覧)
 
 Editor (9 pages)
   /edit/results            Game results CRUD
