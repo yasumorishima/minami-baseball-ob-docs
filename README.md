@@ -201,7 +201,7 @@ Open-Meteo API（無料）を使った球場別天気予報。予定との連動
 - **Enlarged mobile hourly icons** (16 → 40 px) so composite icons like 晴れ時々くもり are actually distinguishable
 - **30-min ISR cache** via `next.revalidate` to avoid excessive API calls
 - **Home weather ticker (TV 端風)**: ヒーロー直下に横浜スタジアム (OB 会 primary 球場) 専用の 1 行天気バーを常時表示。 dark bg (`bg-hero-bg`) + チームエンジ色 2px トップライン + 左流れマーキー (CSS @keyframes 35s linear infinite、 hover で停止、 `prefers-reduced-motion` で静的表示)、 タップで `/weather` 全球場ページへ遷移。 mobile では指で swipe して手動横スクロール (touchmove 8px 超で animation pause + native scroll、 inner computed transform から scrollLeft 転写で視覚スナップ防止、 touchend 4 秒 idle で animation 頭から再開)。 内容: 天気アイコン / 球場名 / 気温 / 降水% / 当日 WBGT 警戒 chip (出る日のみ、 文字は mobile 14px / sm+ 16px)。 Server Component で `fetchWeather` を `/weather` と Data Cache 共有 (URL 同一 → dedup) + 30 分 ISR、 touch handler のみ Client Component に分離
-- **Home section rhythm**: `--color-section-white` theme token (`#ffffff` light / `#2a2520` dark) を追加、 「新着情報」 section に `bg-section-white` を適用してヒーロー → マーキー (dark) → 活動紹介 (cream-alt) → ... → 新着情報 (white) → 今後の予定 (cream-alt) の cream / yellow / white 3 段リズムを生む
+- **Section rhythm (home + sub-pages)**: `--color-section-white` theme token (`#ffffff` light / `#2a2520` dark) を追加、 home の「新着情報」 section に `bg-section-white` を適用してヒーロー → マーキー (dark) → 活動紹介 (cream-alt) → ... → 新着情報 (white) → 今後の予定 (cream-alt) の cream / yellow / white 3 段リズム。 さらに `<PageSection bg="white|alt|transparent">` 共有 component を抽出して `/schedule` `/announcements` `/results` `/history` の 4 sub-page にも展開、 Header band (transparent) + Content band (white) の 2 band 構造で home との視覚整合性を確保
 - Smooth card expand/collapse animation with scroll position correction
 
 ### Historical Game Database (1955-2026)
@@ -221,7 +221,7 @@ Supabase `history_matches` テーブルに<!--stat:senseki-->681<!--/stat-->試�
 
 外部CMSを使わず、**Supabase + Next.js で構築した独自CMS**。ソフトデリート、変更履歴、監査ログを標準装備。
 
-- **9 editor pages**: Results, Schedule, Announcements, Media, Masters, History, Dues, Members Posts, Golf
+- **9 editor pages** (4 groups: 試合関連 / 大会・行事 / OB会情報 / 会費・設定): Results, Schedule, Announcements, Media, Masters, History, Dues, Members Posts, Golf
 - **Inline editing**: Edit content directly on detail pages including historical game records (no page transition)
 - **Update tracking**: All tables have `updated_by` (auto-set by DB trigger via `auth.uid()`), displayed on detail pages as "✏️ XX期 名前 · 日付"
 - **Venue maps**: Google Maps Embed API (place mode) on schedule/results detail pages, with Google Maps / Apple Maps navigation buttons. Resolution priority: row-level `venue_map_query` (manual override) > `lib/venues.ts` master via `matchVenue()` (10 stadiums incl. 南高/潮風/横浜スタジアム/横須賀/相模原/平塚/南足柄/大和引地台/等々力/新杉田) > raw `venue` text. Master is the primary source so admins don't need to fill `venue_map_query` for known venues, and alias matching auto-resolves variants (e.g. 南高ホール / 南高グラウンド → 横浜市立南高等学校)
