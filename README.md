@@ -52,7 +52,7 @@
 | Auth | **Supabase Auth** (Google OAuth / SSR cookie pattern) |
 | Storage | **Supabase Storage** (photos + videos + member docs + golf score PDFs, client-side resize) |
 | Hosting | **Vercel** (git push auto-deploy) |
-| CI/CD | **GitHub Actions** (private = 6 workflows on RPi5 self-hosted ARM64: check-current-team / gitleaks / keep-alive / member-request / purge-deleted-photos / sync-roles; 公開 cron [minami-public-cron](https://github.com/yasumorishima/minami-public-cron) で 4 workflow on ubuntu-latest: warm-weather / keep-alive / daily-message / update-readme-stats。 daily-message は 2026-05-21 から public-cron 側 `*/30` polling が primary (self-hosted 版は disabled) + **RPi5 cron `*/30 * * * *` polling を redundant path** として並行稼働、 GHA scheduler 極端遅延時の fallback、 API 冪等性で重複生成なし) |
+| CI/CD | **GitHub Actions** (private repo = 4 active workflows on RPi5 self-hosted ARM64: check-current-team / gitleaks / keep-alive / purge-deleted-photos; **2026-05-24 に member-request / sync-roles を [minami-public-cron](https://github.com/yasumorishima/minami-public-cron) へ移行** — private repo の GHA quota 枯渇 + RPi5 SSD outage 二重 block 対策、 GitHub App installation token で private repo に push/PR back。 public-cron = 8 workflows on ubuntu-latest: warm-weather / keep-alive / daily-message / update-readme-stats / member-request / sync-roles / health-check / health-check-ack。 daily-message は public-cron `*/30` polling が primary (self-hosted 版は disabled) + **RPi5 cron `*/30 * * * *` redundant path** で並行稼働、 GHA scheduler 極端遅延時の fallback、 API 冪等性で重複生成なし) |
 | Analytics | **Google Analytics 4** (Cookie consent gate) |
 | Maps | **Google Maps Embed API** (venue maps with navigation links) |
 | Weather | **Open-Meteo API** (free, no API key, 30-min ISR cache + 30-min external cron warm to keep all 10 venues fresh for the first morning visitor) |
@@ -77,15 +77,15 @@
                          |  Vercel API     |
                          |  /api/gas-proxy |  (GitHub App minami-baseball-ob-bot)
                          +--------+--------+
-                                  | repository_dispatch
+                                  | repository_dispatch (target: minami-public-cron)
                                   v
      +----------------------------+----------------------------+
-     |                     GitHub Actions                      |
-     |  member-request  sync-roles  purge  check-team  stats  |
+     |          GitHub Actions (minami-public-cron, public)    |
+     |  member-request  sync-roles  health-check (hourly)      |
      +---+---------------------+-------------------------------+
-         |                     |
-         | PR auto-create      | Role sync
-         |                     |
+         | App token push      | App token + Supabase REST
+         | + PR back to        | + GAS approval-notify
+         | private repo        |
      +---v---------------------v---+     +-------------------+
      |         GitHub Repo         |     |   Vercel (CDN)    |
      |  config/members.yml (RBAC)  +---->+   Auto Deploy     |
@@ -344,8 +344,9 @@ Storage buckets:
 
 | Workflow | Trigger | What it does |
 |----------|---------|-------------|
-| **Member Request PR** | Google Form (GAS → Vercel proxy `/api/gas-proxy/dispatch` → `repository_dispatch`) | Auto-creates PR with role config, stores name in Supabase directly |
-| **Sync Member Roles** | Push to `config/members.yml` | Parses YAML, updates Supabase `user_roles`, demotes unlisted users |
+| **Member Request PR** (public-cron) | Google Form (GAS → Vercel proxy `/api/gas-proxy/dispatch` → `repository_dispatch` to **[minami-public-cron](https://github.com/yasumorishima/minami-public-cron)**) | Auto-creates PR with role config, stores name in Supabase directly。 public-cron 側で GitHub App installation token を mint → private repo を clone → branch push → `gh pr create` で PR back。 private repo の GHA quota 枯渇 + RPi5 outage 二重 block 対策で 2026-05-24 移行 |
+| **Sync Member Roles** (public-cron) | `*/15 * * * *` polling on **[minami-public-cron](https://github.com/yasumorishima/minami-public-cron)** | App token で private repo の `config/members.yml` を fetch → parse → Supabase `user_roles` に diff 同期 (idempotent、 role change 検出時のみ GAS Gmail で承認通知)。 旧 push trigger は同 quota 制約で移行、 polling だが冪等のため副作用なし |
+| **Health Check** (public-cron, monitoring) | Hourly (`7 * * * *`) on minami-public-cron | 5 probe を hourly で実行: ① Vercel proxy `/api/gas-proxy/dispatch` 200 必須 ② dispatch chain → ack workflow 5min 以内 ③ GAS time trigger gas-heartbeat 鮮度 2.16h 以内 ④ gas-issue-form Web App secret 一致 (feedback Gmail path) ⑤ sync-roles 直近 3h 内 success。 失敗時 GHA standard email + GAS GmailApp の二系統 alert。 2026-04-20 〜 05-24 (1 ヶ月超 silent fail) 事案の再発防止 |
 | **Purge Deleted Records** | Daily (UTC 19:00) | Removes soft-deleted records + Storage objects older than 7 days |
 | **Keep Supabase Alive** | Weekly (Sunday UTC 0:00) | Pings Supabase REST API to prevent free-tier hibernation |
 | **Check Current Team** | Weekly (Monday JST 19:00) | Scrapes kyureki.com + hb-nippon.com for new games, inserts into Supabase, creates Issue |
@@ -398,6 +399,7 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 | **Audit log tamper resistance** | `audit_logs_insert` RLS policy uses `WITH CHECK (user_id = auth.uid())` (migration `20260502_audit_logs_insert_self_only.sql`). Authenticated users cannot spoof other users' audit entries by passing arbitrary `user_id`. `SECURITY DEFINER` triggers (`log_user_roles_change` / `log_soft_delete`) continue to record `auth.uid()` correctly because the policy is satisfied. `service_role` server-side inserts bypass RLS as designed |
 | **Secrets rotation runbook** | `DEVELOPMENT.md` includes a "Secrets Rotation" section documenting per-key rotation steps for `SUPABASE_SERVICE_ROLE_KEY` / Supabase JWT secret / `GITHUB_APP_PRIVATE_KEY` / `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` / `FEEDBACK_GAS_SECRET` / `GEMINI_API_KEY`. Includes a 4-step leak response checklist, recommended rotation cadence, and guidance on the Supabase new API key system (`sb_publishable_*` / `sb_secret_*`, introduced 2024/11) vs the Legacy JWT migration |
 | **Image optimization abuse defense** | `robots.txt` blocks 25 AI/scraper bots (Meta-ExternalAgent, GPTBot, ClaudeBot, Google-Extended, CCBot, Bytespider, PerplexityBot, etc.) with `Disallow: /`, plus `/_next/image` for all crawlers. All Supabase Storage `<Image>` sites use `unoptimized` so transforms bypass Vercel's Image Optimization (Supabase already serves through its own CDN, so the second-pass optimization is pure cost). `images.minimumCacheTTL` is pinned to 1 year so any remaining transforms amortize across crawler revisits. Defends against the "AI crawler hammers `/_next/image` with millions of unique transform requests" abuse pattern reported in the OpenNext + Cloudflare Images community |
+| **Silent-fail monitoring** | 会員申請 + フィードバックパイプライン全段 (Vercel proxy / dispatch chain / GAS time trigger / gas-issue-form secret / sync-roles polling) を minami-public-cron の `health-check.yml` で hourly 検査 + GAS `hourlyHealthCheck` から内側 probe、 失敗時は GHA failure email + GAS GmailApp の二系統で admin alert。 2026-04-20 の `appsscript.json` oauthScope 追加で trigger OAuth 失効 → form 申請 1 ヶ月超 silent fail した事案を受け、 二度と気付かないことが起きないよう外側 + 内側 + 二系統通知の三重防御 |
 
 ---
 
