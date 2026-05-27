@@ -182,6 +182,15 @@ OBメンバーがGitHub不要でフィードバックを送信できる仕組み
 - Camera/gallery image upload with client-side compression (up to 3 images)
 - Honeypot + IP rate limiting (5 requests/hour) for spam protection
 
+### イニング別スコアボード (Line Score, マスターズ甲子園限定)
+
+マスターズ甲子園 (予選/本選) の試合は、試合結果一覧 (`/results`) と試合詳細 (`/results/[id]`) で野球中継風のラインスコア (各回得点 + R 合計) を表示。
+
+- 先攻チームを上段 / 後攻チームを下段に配置 (`results.inning_scores` JSONB: `{ is_home, us[], them[] }`)
+- 後攻のサヨナラ勝ち・最終回を攻撃しなかった場合 (×) は `x` 表記を自動判定
+- 編集フォームからもマスターズ試合限定で入力可。現役・練習試合・その他には表示しない
+- チーム名と R (合計) 列は横スクロール時も sticky 固定、モバイル幅でも判読可能 (ダークモードはチーム名を accent 色で可読化)
+
 ### Weather Forecast Integration
 
 Open-Meteo API（無料）を使った球場別天気予報。予定との連動で試合当日の天気をすぐ確認できる。
