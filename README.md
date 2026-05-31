@@ -49,7 +49,7 @@
 | Language | **TypeScript 5.8** (strict mode) |
 | Styling | **Tailwind CSS 4** (PostCSS-first, `@theme` CSS variables) |
 | Database | **Supabase** (PostgreSQL + RLS + DB Triggers) |
-| Auth | **Supabase Auth** (Google OAuth / SSR cookie pattern) |
+| Auth | **Supabase Auth** (Google OAuth / SSR cookie pattern)。ログイン失敗時は生の技術エラー（PKCE 等）を表示せずやさしい日本語に変換し、PKCE/verifier 系は1回だけ自動リトライ（ループ防止）で多くは無音でログイン完了 |
 | Storage | **Supabase Storage** (photos + videos + member docs + golf score PDFs, client-side resize) |
 | Hosting | **Vercel** (git push auto-deploy) |
 | CI/CD | **GitHub Actions** (private repo = gitleaks (基本は ubuntu-latest 無料枠で push/PR/手動の全履歴 secret scan、 無料枠枯渇で hosted job が起動不能な時は RPi5 self-hosted runner `rpi5-minami`(arm64) に自動 fallback してスキャンが途切れない)。 2026-05-30 RPi5 self-hosted runner を全廃し check-current-team / purge-deleted-photos は public-cron へ移行 (keep-alive は従来から public-cron); **2026-05-24 に member-request / sync-roles を [minami-public-cron](https://github.com/yasumorishima/minami-public-cron) へ移行** — private repo の GHA quota 枯渇 + RPi5 SSD outage 二重 block 対策、 GitHub App installation token で private repo に push/PR back。 public-cron = 10 workflows on ubuntu-latest: warm-weather / keep-alive / daily-message / update-readme-stats / member-request / sync-roles / health-check / health-check-ack / purge-deleted-photos / check-current-team。 daily-message は public-cron `*/30` polling が primary (self-hosted 版は disabled) + **RPi5 cron `*/30 * * * *` redundant path** で並行稼働、 GHA scheduler 極端遅延時の fallback、 API 冪等性で重複生成なし) |
