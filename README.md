@@ -419,6 +419,7 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 
 - Mobile-first responsive design (base font 18px, line-height 1.7)
 - **PC viewport typography scaling**: 全 page で `md:` (768px+) / `lg:` (1024px+) breakpoints で text size を段階的に拡大 (mobile/sm の見え方は keep)。 35+ files / 120+ commits で home / ticker / header / footer / 各 public page / 詳細 page / 認証 page 全てを PC ブラウザで可読性のあるサイズに調整
+- **Font size toggle (文字サイズ切替)**: ヘッダーに「大きく / 標準」トグルを常時表示（高齢メンバー配慮）。`html[data-font-size="large"] { font-size: 112.5% }` で rem ベースの文字・余白・アイコンをサイト全体で一括ズーム。localStorage 永続化 + `<head>` inline script で初回ペイント前に適用（フラッシュ防止）、body は px→rem 化で既定サイズは従来値（mobile 18px / desktop 16px）と厳密一致
 - All touch targets >= 44px
 - Dark mode with team color accent (maroon `#7b2234` / dark rose `#d08090`)
 - `aria-label` on result badges (Win/Loss/Draw)
