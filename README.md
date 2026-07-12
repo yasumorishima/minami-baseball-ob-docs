@@ -53,7 +53,7 @@
 | Storage | **Supabase Storage** (photos + videos + member docs + golf score PDFs, client-side resize) |
 | Hosting | **Vercel** (git push auto-deploy) |
 | CI/CD | **GitHub Actions** (private repo = gitleaks (基本は ubuntu-latest 無料枠で push/PR/手動の全履歴 secret scan、 無料枠枯渇で hosted job が起動不能な時は RPi5 self-hosted runner `rpi5-minami`(arm64) に自動 fallback してスキャンが途切れない)。 2026-05-30 RPi5 self-hosted runner を全廃し check-current-team / purge-deleted-photos は public-cron へ移行 (keep-alive は従来から public-cron); **2026-05-24 に member-request / sync-roles を [minami-public-cron](https://github.com/yasumorishima/minami-public-cron) へ移行** — private repo の GHA quota 枯渇 + RPi5 SSD outage 二重 block 対策、 GitHub App installation token で private repo に push/PR back。 public-cron = 10 workflows on ubuntu-latest: warm-weather / keep-alive / daily-message / update-readme-stats / member-request / sync-roles / health-check / health-check-ack / purge-deleted-photos / check-current-team。 daily-message は public-cron `*/30` polling が primary (self-hosted 版は disabled) + **RPi5 cron `*/30 * * * *` redundant path** で並行稼働、 GHA scheduler 極端遅延時の fallback、 API 冪等性で重複生成なし) |
-| Analytics | **Google Analytics 4** (Cookie consent gate) |
+| Analytics | **Google Analytics 4**（オプトアウト方式・既定で計測 ON、同意ポップアップなし、プライバシー / 設定の「計測を止める」トグルで停止可）。**公開ダッシュボード `/insights`**（GA4 Data API・日別 PV / 人気ページ〔試合詳細は実名解決〕/ 参照元 / 端末を inline SVG 表示、ISR 1h、cookieless） |
 | Maps | **Google Maps Embed API** (venue maps with navigation links) |
 | Weather | **Open-Meteo API** (free, no API key, 30-min ISR cache + 30-min external cron warm to keep all 10 venues fresh for the first morning visitor) |
 | Testing | **Playwright** (e2e: skeleton/navigation/weather/screenshot) |
@@ -397,7 +397,7 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 | **Source secret leak prevention** | `gitleaks` GHA (`.github/workflows/gitleaks.yml`) scans the full git history on every PR / `master` push / manual dispatch. The scan runs on the free GitHub Actions tier (`ubuntu-latest`, x86_64) by default and automatically falls back to an RPi5 self-hosted runner (`rpi5-minami`, arm64) when the hosted job cannot start (e.g. free-tier quota/billing exhaustion), so scanning never silently lapses; the hosted job is `continue-on-error` and gated on an output flag set only on a clean pass, so the fallback also fires on a real finding (detection intact). Both the x86_64 and arm64 gitleaks binaries are SHA256-verified at install time to lock the supply chain. `.gitleaks.toml` allowlists only `NEXT_PUBLIC_*` placeholders and example files. Designed as an enforced defense against the Money Forward 2026-05-01 incident pattern, where source-code-embedded credentials forced a mass invalidation and reissue. GitHub native Secret Scanning is paid-only on private repos, so gitleaks substitutes for the same goal |
 | **Dependabot** | Vulnerability auto-detection |
 | **Privacy-first membership** | Personal names never appear in Git history (UUID + graduation year only) |
-| **Cookie consent** | GA4 script loads only after explicit user consent |
+| **アクセス解析** | オプトアウト方式（既定 ON・外部送信内容を privacy に開示・利用者はいつでも計測停止可能）。個人を直接特定する情報は送信しない |
 | **Session management** | 60-min idle timeout with auto-logout (cross-tab sync, 5-min warning) |
 | **Account deletion** | Users can fully delete their account (auth + user_roles) |
 | **Data export** | Users can download their data as JSON |
@@ -438,7 +438,8 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 - **LINE browser support**: Auto-detect LINE in-app browser on login — redirects to external browser for Google OAuth compatibility
 - **Safe delete UX**: Delete buttons are hidden from list views entirely — only accessible after entering edit mode or a dedicated select mode, always followed by a confirmation modal. Uses a high-visibility red button with 🗑 icon in the edit form header for clear discoverability in both light and dark mode
 - Scroll-to-top floating button
-- Cookie consent banner (GA4 loads only after consent)
+- アクセス解析はオプトアウト方式（同意ポップアップ廃止・GA4 は既定で計測・プライバシー / 設定ページから停止可能）
+- 公開アクセス解析ページ `/insights`（GA4 Data API・日別 PV / 人気ページ / 参照元 / 端末）
 
 ---
 
@@ -464,7 +465,8 @@ Public (17 pages)
 
 Auth (5 pages)
   /login                   Google OAuth login
-  /account                 Profile, data export, cookie settings, account deletion
+  /account                 Profile, data export, analytics opt-out, account deletion
+  /insights                Public access-analytics dashboard (GA4 Data API)
   /bookmarks               Saved articles
   /members-only            Hub: 6 sub-page navigation
   /members-only/sokai      OB会総会 posts (fiscal year grouping)
