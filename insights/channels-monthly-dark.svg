@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="400" viewBox="0 0 880 400" font-family="-apple-system,Segoe UI,Hiragino Sans,Noto Sans JP,Yu Gothic,sans-serif">
+<rect width="880" height="400" rx="8" fill="#0d1117"/>
+<text x="24" y="38" font-size="20" font-weight="700" fill="#e6edf3">9月は「直接アクセス」からの割合が8月より2ポイント増えた</text>
+<text x="24" y="64" font-size="14" fill="#9198a1">7月は12日から・10月は8日まで（色を抑えた棒）</text>
+<rect x="64" y="80" width="14" height="14" rx="3" fill="#3987e5"/>
+<text x="84" y="92" font-size="14" fill="#e6edf3">直接アクセス</text>
+<rect x="194" y="80" width="14" height="14" rx="3" fill="#d95926"/>
+<text x="214" y="92" font-size="14" fill="#e6edf3">検索</text>
+<rect x="268" y="80" width="14" height="14" rx="3" fill="#199e70"/>
+<text x="288" y="92" font-size="14" fill="#e6edf3">SNS</text>
+<rect x="338" y="80" width="14" height="14" rx="3" fill="#c98500"/>
+<text x="358" y="92" font-size="14" fill="#e6edf3">リンク経由</text>
+<rect x="454" y="80" width="14" height="14" rx="3" fill="#d55181"/>
+<text x="474" y="92" font-size="14" fill="#e6edf3">その他</text>
+<line x1="64" y1="356.0" x2="860" y2="356.0" stroke="#30363d"/>
+<text x="54" y="361.0" font-size="14" text-anchor="end" fill="#9198a1">0%</text>
+<line x1="64" y1="234.0" x2="860" y2="234.0" stroke="#30363d"/>
+<text x="54" y="239.0" font-size="14" text-anchor="end" fill="#9198a1">50%</text>
+<line x1="64" y1="112.0" x2="860" y2="112.0" stroke="#30363d"/>
+<text x="54" y="117.0" font-size="14" text-anchor="end" fill="#9198a1">100%</text>
+<text x="163.5" y="384" font-size="14" text-anchor="middle" fill="#9198a1">2026/7</text>
+<rect x="118.5" y="258.2" width="90.0" height="96.8" fill="#3987e5" opacity="0.55"><title>2026-07 直接アクセス: 41%</title></rect>
+<text x="163.5" y="311.6" font-size="14" text-anchor="middle" fill="#0d1117">41%</text>
+<rect x="118.5" y="126.9" width="90.0" height="129.3" fill="#d95926" opacity="0.55"><title>2026-07 検索: 54%</title></rect>
+<text x="163.5" y="196.5" font-size="14" text-anchor="middle" fill="#0d1117">54%</text>
+<rect x="118.5" y="113.0" width="90.0" height="11.9" fill="#c98500" opacity="0.55"><title>2026-07 リンク経由: 6%</title></rect>
+<text x="362.5" y="384" font-size="14" text-anchor="middle" fill="#9198a1">8月</text>
+<rect x="317.5" y="236.1" width="90.0" height="118.9" fill="#3987e5"><title>2026-08 直接アクセス: 50%</title></rect>
+<text x="362.5" y="300.6" font-size="14" text-anchor="middle" fill="#0d1117">50%</text>
+<rect x="317.5" y="122.0" width="90.0" height="112.2" fill="#d95926"><title>2026-08 検索: 47%</title></rect>
+<text x="362.5" y="183.0" font-size="14" text-anchor="middle" fill="#0d1117">47%</text>
+<rect x="317.5" y="115.2" width="90.0" height="4.7" fill="#c98500"><title>2026-08 リンク経由: 3%</title></rect>
+<rect x="317.5" y="113.0" width="90.0" height="0.5" fill="#d55181"><title>2026-08 その他: 1%未満</title></rect>
+<text x="561.5" y="384" font-size="14" text-anchor="middle" fill="#9198a1">9月</text>
+<rect x="516.5" y="230.2" width="90.0" height="124.8" fill="#3987e5"><title>2026-09 直接アクセス: 52%</title></rect>
+<text x="561.5" y="297.6" font-size="14" text-anchor="middle" fill="#0d1117">52%</text>
+<rect x="516.5" y="117.8" width="90.0" height="110.4" fill="#d95926"><title>2026-09 検索: 46%</title></rect>
+<text x="561.5" y="178.0" font-size="14" text-anchor="middle" fill="#0d1117">46%</text>
+<rect x="516.5" y="113.0" width="90.0" height="2.8" fill="#c98500"><title>2026-09 リンク経由: 2%</title></rect>
+<text x="760.5" y="384" font-size="14" text-anchor="middle" fill="#9198a1">10月</text>
+<rect x="715.5" y="242.6" width="90.0" height="112.4" fill="#3987e5" opacity="0.55"><title>2026-10 直接アクセス: 47%</title></rect>
+<text x="760.5" y="303.8" font-size="14" text-anchor="middle" fill="#0d1117">47%</text>
+<rect x="715.5" y="143.5" width="90.0" height="97.1" fill="#d95926" opacity="0.55"><title>2026-10 検索: 41%</title></rect>
+<text x="760.5" y="197.1" font-size="14" text-anchor="middle" fill="#0d1117">41%</text>
+<rect x="715.5" y="120.6" width="90.0" height="20.9" fill="#c98500" opacity="0.55"><title>2026-10 リンク経由: 9%</title></rect>
+<rect x="715.5" y="113.0" width="90.0" height="5.6" fill="#d55181" opacity="0.55"><title>2026-10 その他: 3%</title></rect>
+</svg>

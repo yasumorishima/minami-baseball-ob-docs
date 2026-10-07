@@ -8,17 +8,19 @@
 
 <!-- insights-start (auto-updated daily by GitHub Actions) -->
 
-### サイトのアクセス状況
+### どこから見に来ているか
 
-| 累計の閲覧数（2026-07-12 以降） | 直近30日の閲覧数 | 直近30日の訪問者数 | スマホからの閲覧（直近30日） |
-|---:|---:|---:|---:|
-| <!--ins:total-->1,709<!--/ins--> | 436 | 59 | 69% |
+| 直接アクセス | 検索 | リンク経由 | その他 | SNS | スマホから |
+|---:|---:|---:|---:|---:|---:|
+| 53% | 42% | 4% | 1%未満 | 0% | 68% |
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="insights/daily-dark.svg"><img src="insights/daily-light.svg" alt="日別の閲覧数" width="100%"></picture>
+<sub>直近30日の割合。参照元は訪問（セッション）ごと、スマホは閲覧ごとに数えています。</sub>
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="insights/monthly-dark.svg"><img src="insights/monthly-light.svg" alt="月別の閲覧数" width="100%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="insights/channels-dark.svg"><img src="insights/channels-light.svg" alt="直近30日の参照元の割合" width="100%"></picture>
 
-<sub>最終更新 2026-10-08（JST）・Google Analytics 4 の集計（サイトの [アクセス解析ページ](https://minami-baseball-ob.vercel.app/insights) と同じ集計）を GitHub Actions が毎日取得。2026-07-11 以前は計測の不具合で記録がありません（グラフは 2026-07-12 から）。</sub>
+<picture><source media="(prefers-color-scheme: dark)" srcset="insights/channels-monthly-dark.svg"><img src="insights/channels-monthly-light.svg" alt="月別の参照元の割合" width="100%"></picture>
+
+<sub>最終更新 2026-10-08（JST）・Google Analytics 4 の集計（サイトの [アクセス解析ページ](https://minami-baseball-ob.vercel.app/insights) と同じデータの参照元を 5 つにまとめたもの）を GitHub Actions が毎日取得。2026-07-11 以前は計測の不具合で記録がありません（グラフは 2026-07-12 から）。</sub>
 
 <!-- insights-end -->
 
