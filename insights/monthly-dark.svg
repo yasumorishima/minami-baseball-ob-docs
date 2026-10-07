@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="340" viewBox="0 0 880 340" font-family="-apple-system,Segoe UI,Hiragino Sans,Noto Sans JP,Yu Gothic,sans-serif">
+<rect width="880" height="340" rx="8" fill="#0d1117"/>
+<text x="70" y="34" font-size="20" font-weight="700" fill="#e6edf3">月別の閲覧数</text>
+<text x="860" y="34" font-size="14" text-anchor="end" fill="#9198a1">7月は12日から・10月は7日まで（色の淡い棒）</text>
+<line x1="70" y1="294.0" x2="860" y2="294.0" stroke="#30363d"/>
+<text x="60" y="299.0" font-size="14" text-anchor="end" fill="#9198a1">0</text>
+<line x1="70" y1="236.5" x2="860" y2="236.5" stroke="#30363d"/>
+<text x="60" y="241.5" font-size="14" text-anchor="end" fill="#9198a1">200</text>
+<line x1="70" y1="179.0" x2="860" y2="179.0" stroke="#30363d"/>
+<text x="60" y="184.0" font-size="14" text-anchor="end" fill="#9198a1">400</text>
+<line x1="70" y1="121.5" x2="860" y2="121.5" stroke="#30363d"/>
+<text x="60" y="126.5" font-size="14" text-anchor="end" fill="#9198a1">600</text>
+<line x1="70" y1="64.0" x2="860" y2="64.0" stroke="#30363d"/>
+<text x="60" y="69.0" font-size="14" text-anchor="end" fill="#9198a1">800</text>
+<rect x="109.5" y="88.4" width="118.5" height="205.6" fill="#2a4a70"><title>2026-07: 715</title></rect>
+<text x="168.8" y="81.4" font-size="14" text-anchor="middle" fill="#e6edf3">715</text>
+<rect x="307.0" y="153.4" width="118.5" height="140.6" fill="#58a6ff"><title>2026-08: 489</title></rect>
+<text x="366.2" y="146.4" font-size="14" text-anchor="middle" fill="#e6edf3">489</text>
+<rect x="504.5" y="170.1" width="118.5" height="123.9" fill="#58a6ff"><title>2026-09: 431</title></rect>
+<text x="563.8" y="163.1" font-size="14" text-anchor="middle" fill="#e6edf3">431</text>
+<rect x="702.0" y="273.9" width="118.5" height="20.1" fill="#2a4a70"><title>2026-10: 70</title></rect>
+<text x="761.2" y="266.9" font-size="14" text-anchor="middle" fill="#e6edf3">70</text>
+<text x="168.8" y="324" font-size="14" text-anchor="middle" fill="#9198a1">2026/7</text>
+<text x="366.2" y="324" font-size="14" text-anchor="middle" fill="#9198a1">8月</text>
+<text x="563.8" y="324" font-size="14" text-anchor="middle" fill="#9198a1">9月</text>
+<text x="761.2" y="324" font-size="14" text-anchor="middle" fill="#9198a1">10月</text>
+</svg>
