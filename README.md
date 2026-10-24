@@ -12,7 +12,7 @@
 
 | 検索 | 直接アクセス | リンク経由 | SNS | その他 | スマホから |
 |---:|---:|---:|---:|---:|---:|
-| 53% | 42% | 5% | 0% | 0% | 47% |
+| 52% | 43% | 6% | 0% | 0% | 47% |
 
 <sub>直近30日の割合。参照元は訪問（セッション）ごと、スマホは閲覧ごとに数えています。</sub>
 
@@ -20,7 +20,7 @@
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="insights/channels-monthly-dark.svg"><img src="insights/channels-monthly-light.svg" alt="月別の参照元の割合" width="100%"></picture>
 
-<sub>最終更新 2026-10-24（JST）・Google Analytics 4 の集計（サイトの [アクセス解析ページ](https://minami-baseball-ob.vercel.app/insights) と同じデータの参照元を 5 つにまとめたもの）を GitHub Actions が毎日取得。2026-07-11 以前は計測の不具合で記録がありません（グラフは 2026-07-12 から）。</sub>
+<sub>最終更新 2026-10-25（JST）・Google Analytics 4 の集計（サイトの [アクセス解析ページ](https://minami-baseball-ob.vercel.app/insights) と同じデータの参照元を 5 つにまとめたもの）を GitHub Actions が毎日取得。2026-07-11 以前は計測の不具合で記録がありません（グラフは 2026-07-12 から）。</sub>
 
 <!-- insights-end -->
 
