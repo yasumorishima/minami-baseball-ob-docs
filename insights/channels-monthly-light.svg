@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="880" height="400" viewBox="0 0 880 400" font-family="-apple-system,Segoe UI,Hiragino Sans,Noto Sans JP,Yu Gothic,sans-serif">
 <rect width="880" height="400" rx="8" fill="#ffffff"/>
 <text x="24" y="38" font-size="20" font-weight="700" fill="#1f2328">10月は「直接アクセス」からの割合が9月より9ポイント減った</text>
-<text x="24" y="64" font-size="14" fill="#59636e">7月は12日から・11月は6日まで（色を抑えた棒）</text>
+<text x="24" y="64" font-size="14" fill="#59636e">7月は12日から・11月は7日まで（色を抑えた棒）</text>
 <rect x="64" y="80" width="14" height="14" rx="3" fill="#2a78d6"/>
 <text x="84" y="92" font-size="14" fill="#1f2328">直接アクセス</text>
 <rect x="194" y="80" width="14" height="14" rx="3" fill="#eb6834"/>
@@ -44,9 +44,10 @@
 <text x="621.2" y="194.8" font-size="14" text-anchor="middle" fill="#111111">50%</text>
 <rect x="576.2" y="113.0" width="90.0" height="14.3" fill="#eda100"><title>2026-10 リンク経由: 7%</title></rect>
 <text x="780.4" y="384" font-size="14" text-anchor="middle" fill="#59636e">11月</text>
-<rect x="735.4" y="268.3" width="90.0" height="86.7" fill="#2a78d6" opacity="0.55"><title>2026-11 直接アクセス: 36%</title></rect>
-<text x="780.4" y="316.6" font-size="14" text-anchor="middle" fill="#111111">36%</text>
-<rect x="735.4" y="135.2" width="90.0" height="131.1" fill="#eb6834" opacity="0.55"><title>2026-11 検索: 55%</title></rect>
-<text x="780.4" y="205.7" font-size="14" text-anchor="middle" fill="#111111">55%</text>
-<rect x="735.4" y="113.0" width="90.0" height="20.2" fill="#eda100" opacity="0.55"><title>2026-11 リンク経由: 9%</title></rect>
+<rect x="735.4" y="259.4" width="90.0" height="95.6" fill="#2a78d6" opacity="0.55"><title>2026-11 直接アクセス: 40%</title></rect>
+<text x="780.4" y="312.2" font-size="14" text-anchor="middle" fill="#111111">40%</text>
+<rect x="735.4" y="145.5" width="90.0" height="111.9" fill="#eb6834" opacity="0.55"><title>2026-11 検索: 47%</title></rect>
+<text x="780.4" y="206.5" font-size="14" text-anchor="middle" fill="#111111">47%</text>
+<rect x="735.4" y="129.3" width="90.0" height="14.3" fill="#eda100" opacity="0.55"><title>2026-11 リンク経由: 7%</title></rect>
+<rect x="735.4" y="113.0" width="90.0" height="14.3" fill="#e87ba4" opacity="0.55"><title>2026-11 その他: 7%</title></rect>
 </svg>
