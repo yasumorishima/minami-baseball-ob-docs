@@ -333,7 +333,7 @@ Storage buckets:
 | `announcements` | News posts. Soft delete |
 | `members_posts` | Members-only posts (4 categories, file attachments via JSONB, fiscal year grouping). Soft delete |
 | `photos` | Photo metadata (Storage integration, FK linkage, soft delete, history linkage) |
-| `videos` | Videos (YouTube embed URL) |
+| `videos` | Videos（`video_type`＝`youtube`: YouTube の URL・`t`/`end` で開始・終了秒／`upload`: `storage_path` のファイルを `<video>` で再生。短い動画は公開 repo [`minami-baseball-ob-videos`](https://github.com/yasumorishima/minami-baseball-ob-videos) の GitHub Pages に置き、その https URL を入れる＝Supabase の容量・転送量を使わない・2026-11-14） |
 | `members` | Member info (admin-only read via RLS) |
 | `masters_documents` | Tournament document metadata |
 | `dues_payments` | Membership dues (per fiscal year, with/without account). Soft delete |
