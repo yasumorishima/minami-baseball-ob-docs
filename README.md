@@ -458,13 +458,14 @@ All workflows use **minimal `permissions`** (principle of least privilege).
 - Scroll-to-top floating button
 - アクセス解析はオプトアウト方式（同意ポップアップ廃止・GA4 は既定で計測・プライバシー / 設定ページから停止可能）
 - 公開アクセス解析ページ `/insights`（GA4 Data API・日別 PV / 人気ページ / 参照元 / 端末）
+- 現役部員向けの公開ページ `/data-lab`「野球データラボ」（野球×データサイエンスの教材。一覧 → 教材ごとのページ。Driveline OpenBiomechanics のモーションキャプチャデータ〔図・骨格動画は CC BY-NC-SA 4.0 で出典表示〕と、pybaseball で MLB の Statcast を取り出す手順〔Colab で動くコード・大谷翔平の 2024 年の打球のグラフ〕）
 
 ---
 
 ## Page Structure
 
 ```
-Public (17 pages)
+Public (19 pages)
   /                        Top page (hero + photo grid + news + schedule + results)
   /about                   About the OB association
   /masters                 Masters Koshien info hub
@@ -479,6 +480,8 @@ Public (17 pages)
   /history/[id]            Historical game detail
   /search                  Cross-table full-text search
   /weather                 Venue weather forecast (10 venues, 3-day + hourly)
+  /data-lab                野球データラボ: data-science materials for current players (topic list)
+  /data-lab/[slug]         One topic per page (Driveline OpenBiomechanics, pybaseball)
   /feedback                Bug report / feedback form (Google login required)
 
 Auth (5 pages)
